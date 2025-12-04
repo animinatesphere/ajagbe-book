@@ -1,0 +1,10 @@
+@import url("https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap");
+@import "tailwindcss";
+
+.non {
+  font-family: "Nunito Sans", sans-serif;
+}
+
+.lib {
+  font-family: "Libre Baskerville", serif;
+}
