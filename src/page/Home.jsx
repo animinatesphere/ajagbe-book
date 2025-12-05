@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+// import React, { useEffect, useState } from "react";
 // images moved into their respective components; no direct imports needed here
 import SubscribeModal from "../component/SubscribeModal";
 import Best from "../component/Best";
