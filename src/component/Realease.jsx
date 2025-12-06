@@ -144,7 +144,7 @@ const Realease = () => {
       </style>
 
       {/* container */}
-      <div className="pt-30 pb-30 max-w-[1400px] mx-auto px-4">
+      <div className="pt-30  pb-30 max-w-[1400px] mx-auto px-4">
         <p className="text-[24px] text-[#1C2024] non text-center font-bold mb-8">
           New Realeases
         </p>

@@ -27,7 +27,7 @@ const AwardsBanner = () => {
   }, []);
 
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative overflow-hidden mt-10 mb-10">
       <style>
         {`
           @keyframes slideInRight {

@@ -2,33 +2,22 @@ import { Search, ShoppingCart, User, BookOpen } from "lucide-react";
 import { Menu, X } from "lucide-react";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import logo from "../assets/ggg.JPG";
 export const Navbar = () => {
   const [open, setOpen] = useState(false);
 
-  const links = ["Homes", "About", "Shop", "Event", "Blog"];
+  const links = ["Homes", "About", "Shop", "Event", "Blog", "Contact us"];
 
   return (
     <>
       {/* container */}
-      <div className="flex fixed w-full z-10 items-center justify-between p-6 md:p-8 bg-[#fff] shadow-lg">
+      <div className="flex fixed w-full z-10 items-center justify-between p-2 md:p-4 bg-[#fff] shadow-lg">
         {/* logo */}
-        <div className="flex flex-col items-start md:items-center">
-          <div className="flex items-center gap-3">
-            <BookOpen width={34} height={34} className="text-[#2c2c2c]" />
-            <h1
-              className="lib text-2xl md:text-3xl lg:text-4xl font-bold text-[#2c2c2c] tracking-widest"
-              style={{
-                letterSpacing: "4px",
-                textShadow: "0 2px 6px rgba(0,0,0,0.08)",
-              }}
-            >
-              AJAGBE
-            </h1>
-          </div>
-          <p className="lib text-xs md:text-sm text-[#666666] tracking-wide mt-1">
-            AUTHOR & WRITER
-          </p>
-        </div>
+        <img
+          src={logo}
+          alt=""
+          className="max-w-[100px] h-[100px] object-contain"
+        />
         {/* logo */}
 
         {/* desktop links (hidden on mobile) */}
@@ -43,7 +32,7 @@ export const Navbar = () => {
           </li>
           <li>
             <Link
-              to="/home"
+              to="/about"
               className="text-[#696969] font-bold text-[16px] non uppercase"
             >
               About
@@ -71,6 +60,14 @@ export const Navbar = () => {
               className="text-[#696969] font-bold text-[16px] non uppercase"
             >
               Blog
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/contact"
+              className="text-[#696969] font-bold text-[16px] non uppercase"
+            >
+              Contact us
             </Link>
           </li>
         </ul>

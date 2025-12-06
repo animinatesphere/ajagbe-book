@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 // Import your actual images
-import ch from "../assets/ChatGPT_Image_Dec_4__2025__12_54_10_AM-removebg-preview.png";
+import ch from "../assets/IMG_3702.JPG";
 import medal from "../assets/IMG_7974.WEBP";
 import medal2 from "../assets/IMG_7975.WEBP";
 
