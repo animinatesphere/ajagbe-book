@@ -19,6 +19,7 @@ import me4 from "../assets/IMG_2956.JPG";
 import me5 from "../assets/IMG_3246.JPG";
 import me6 from "../assets/IMG_7970.JPG";
 import me7 from "../assets/IMG_7972.JPG";
+import Footer from "../component/Footer";
 export default function WriterPortfolio() {
   const [scrolled, setScrolled] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -558,6 +559,7 @@ export default function WriterPortfolio() {
           font-style: italic;
         }
       `}</style>
+      <Footer />
     </div>
   );
 }

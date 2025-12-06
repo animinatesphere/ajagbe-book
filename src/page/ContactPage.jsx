@@ -7,6 +7,7 @@ import {
   Phone,
   MessageSquare,
 } from "lucide-react";
+import Footer from "../component/Footer";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -248,6 +249,7 @@ export default function ContactPage() {
           animation: fade-in 0.6s ease-out;
         }
       `}</style>
+      <Footer />
     </div>
   );
 }

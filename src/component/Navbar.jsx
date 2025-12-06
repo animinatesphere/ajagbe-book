@@ -6,7 +6,7 @@ import logo from "../assets/ggg.JPG";
 export const Navbar = () => {
   const [open, setOpen] = useState(false);
 
-  const links = ["Homes", "About", "Shop", "Event", "Blog", "Contact us"];
+  // const links = ["Homes", "About", "Shop", "Event", "Blog", "Contact us"];
 
   return (
     <>
@@ -40,7 +40,7 @@ export const Navbar = () => {
           </li>
           <li>
             <Link
-              to="/home"
+              to="/shop"
               className="text-[#696969] font-bold text-[16px] non uppercase"
             >
               Shop
@@ -48,7 +48,7 @@ export const Navbar = () => {
           </li>
           <li>
             <Link
-              to="/home"
+              to="/event"
               className="text-[#696969] font-bold text-[16px] non uppercase"
             >
               Event
@@ -56,7 +56,7 @@ export const Navbar = () => {
           </li>
           <li>
             <Link
-              to="/home"
+              to="/blog"
               className="text-[#696969] font-bold text-[16px] non uppercase"
             >
               Blog
@@ -129,7 +129,57 @@ export const Navbar = () => {
 
             <nav>
               <ul className="flex flex-col gap-4">
-                {links.map((label, idx) => (
+                <li>
+                  <Link
+                    to="/home"
+                    className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
+                    // style={{ animationDelay: `${idx * 100}ms` }}
+                  >
+                    Homes
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/about"
+                    className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
+                  >
+                    About
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/shop"
+                    className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
+                  >
+                    Shop
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/event"
+                    className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
+                  >
+                    Event
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/Blog"
+                    className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
+                  >
+                    Blog
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/contact"
+                    className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
+                  >
+                    Contact us
+                  </Link>
+                </li>
+
+                {/* {links.map((label, idx) => (
                   <li
                     key={label}
                     className={`animate__animated animate__fadeInUp`}
@@ -142,7 +192,7 @@ export const Navbar = () => {
                       {label}
                     </Link>
                   </li>
-                ))}
+                ))} */}
               </ul>
             </nav>
 
