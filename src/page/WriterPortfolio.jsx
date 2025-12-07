@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   BookOpen,
   Award,
@@ -14,15 +14,25 @@ import mil from "../assets/IMG_3230.JPG";
 import me from "../assets/IMG_2952.JPG";
 import me1 from "../assets/IMG_0397.JPG";
 import me2 from "../assets/IMG_0240.JPG";
-import me3 from "../assets/IMG_2950.JPG";
-import me4 from "../assets/IMG_2956.JPG";
-import me5 from "../assets/IMG_3246.JPG";
-import me6 from "../assets/IMG_7970.JPG";
-import me7 from "../assets/IMG_7972.JPG";
+// import me3 from "../assets/IMG_2950.JPG";
+// import me4 from "../assets/IMG_2956.JPG";
+// import me5 from "../assets/IMG_8145.JPG";
+import me6 from "../assets/IMG_8144.JPG";
+import me7 from "../assets/IMG_8143.JPG";
+import me8 from "../assets/IMG_0396.JPG";
+import v1 from "../assets/VID-20251206-WA0125.mp4";
+import v2 from "../assets/VID-20251206-WA0126.mp4";
+import v3 from "../assets/VID-20251207-WA0027.mp4";
 import Footer from "../component/Footer";
 export default function WriterPortfolio() {
-  const [scrolled, setScrolled] = useState(false);
+  const [, setScrolled] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const videoRef = useRef(null);
+  const [isVideoLoading, setIsVideoLoading] = useState(false);
+  const [videoError, setVideoError] = useState(null);
+  const [showPlayCTA, setShowPlayCTA] = useState(false);
+  // const [isPiP, setIsPiP] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,12 +52,76 @@ export default function WriterPortfolio() {
     };
   }, []);
 
+  // keyboard controls for video modal
+  useEffect(() => {
+    const onKey = async (e) => {
+      if (!selectedVideo || !videoRef.current) return;
+      if (e.key === " ") {
+        // space -> toggle play/pause
+        e.preventDefault();
+        if (videoRef.current.paused) await videoRef.current.play();
+        else videoRef.current.pause();
+      }
+      if (e.key === "Escape") {
+        setSelectedVideo(null);
+      }
+      if (e.key.toLowerCase() === "p") {
+        try {
+          if (document.pictureInPictureElement)
+            await document.exitPictureInPicture();
+          else if (videoRef.current.requestPictureInPicture)
+            await videoRef.current.requestPictureInPicture();
+        } catch (e) {
+          console.debug(e);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selectedVideo]);
+
+  // when a new video is selected, try to play it (with muted fallback for autoplay policies)
+  useEffect(() => {
+    if (!selectedVideo) return;
+    setIsVideoLoading(true);
+    setVideoError(null);
+    setShowPlayCTA(false);
+    const tryPlay = async () => {
+      if (!videoRef.current) return setIsVideoLoading(false);
+      try {
+        // try normal play first
+        await videoRef.current.play();
+        videoRef.current.muted = false; // ensure unmuted if allowed
+        setShowPlayCTA(false);
+      } catch (e) {
+        // autoplay blocked: try muted playback then let user unmute
+        console.debug("Autoplay failed, retrying muted:", e);
+        try {
+          videoRef.current.muted = true;
+          await videoRef.current.play();
+          // muted autoplay worked — show CTA so user can unmute/start with sound
+          setShowPlayCTA(true);
+        } catch (e2) {
+          console.error("Playback failed:", e2);
+          setVideoError("Playback failed — click play to try again.");
+          setShowPlayCTA(true);
+        }
+      } finally {
+        setIsVideoLoading(false);
+      }
+    };
+
+    const t = setTimeout(tryPlay, 60);
+    return () => clearTimeout(t);
+  }, [selectedVideo]);
+
   const books = [
     {
       title: "What Happened to Helen",
       year: "2023",
       pic: hel,
-      genre: "Contemporary Romance",
+      genre: "Psychological Thriller",
       color: "from-rose-100 to-pink-100",
       achievements: [
         "#1 Bambooks Bestseller",
@@ -70,17 +144,134 @@ export default function WriterPortfolio() {
   ];
 
   const gallery = [
-    { id: 1, caption: "Realease of letter of ife", pic: me3 },
+    // { id: 1, caption: "Realease of letter of ife", pic: me3 },
     { id: 2, caption: "With Fellow Authors", pic: me1 },
+
     { id: 3, caption: "Realease of letter of ife", pic: me2 },
-    { id: 3, caption: "Realease of What happened to helen", pic: me4 },
-    { id: 3, caption: "Front cover of Under the Milky Way", pic: me5 },
-    { id: 7, caption: "Front cover of Mandem", pic: me6 },
-    { id: 7, caption: "Front cover of What happened to Helen", pic: me7 },
+
+    // { id: 3, caption: "with fellow friends", pic: me5 },
+    { id: 7, caption: "with fellow friend", pic: me6 },
+    { id: 7, caption: "with fellow friends", pic: me7 },
+    { id: 2, caption: "With Fellow Authors", pic: me8 },
+    // video items (click to play)
+    { id: 11, caption: "Event clip 1", video: v1 },
+    { id: 12, caption: "Event clip 2", video: v2 },
+    { id: 13, caption: "Event clip 3", video: v3 },
   ];
 
   return (
     <div className="min-h-screen z-[1] pt-12 bg-white text-gray-900 overflow-hidden">
+      {/* Video player modal */}
+      {selectedVideo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setSelectedVideo(null)}
+          />
+          <div className="relative z-10 w-full max-w-4xl bg-black rounded-lg overflow-hidden">
+            {/* loading spinner */}
+            {isVideoLoading && (
+              <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40">
+                <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin" />
+              </div>
+            )}
+
+            <video
+              ref={videoRef}
+              poster={selectedVideo.poster}
+              controls
+              autoPlay
+              preload="metadata"
+              onWaiting={() => setIsVideoLoading(true)}
+              onPlaying={() => setIsVideoLoading(false)}
+              onLoadedData={() => setIsVideoLoading(false)}
+              onError={(e) => {
+                console.error("Video element error:", e);
+                setVideoError("There was an error loading the video.");
+                setIsVideoLoading(false);
+              }}
+              className="w-full h-auto max-h-[80vh] bg-black"
+            >
+              <source src={selectedVideo.src} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+
+            {/* Play CTA / Error overlay for autoplay blocked or errors */}
+            {(showPlayCTA || videoError) && (
+              <div className="absolute inset-0 z-30 flex items-center justify-center">
+                <div className="bg-black/60 inset-0 absolute" />
+                <div className="relative z-40 flex flex-col items-center gap-4">
+                  {videoError && (
+                    <div className="text-white bg-red-600 px-4 py-2 rounded">
+                      {videoError}
+                    </div>
+                  )}
+
+                  <button
+                    onClick={async () => {
+                      if (!videoRef.current) return;
+                      setIsVideoLoading(true);
+                      setVideoError(null);
+                      try {
+                        // Try unmuting and play (user gesture)
+                        videoRef.current.muted = false;
+                        await videoRef.current.play();
+                        setShowPlayCTA(false);
+                      } catch (err) {
+                        console.debug("User play failed:", err);
+                        // If unmuted play fails, try muted play so at least video shows
+                        try {
+                          videoRef.current.muted = true;
+                          await videoRef.current.play();
+                          setShowPlayCTA(true);
+                        } catch (err2) {
+                          console.error("Play retry failed:", err2);
+                          setVideoError("Playback failed — please try again.");
+                        }
+                      } finally {
+                        setIsVideoLoading(false);
+                      }
+                    }}
+                    className="px-6 py-3 bg-white text-black rounded-full font-semibold shadow-lg"
+                  >
+                    ▶ Play
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* control buttons: PiP + close */}
+            <div className="absolute top-3 right-3 flex items-center gap-2 z-30">
+              <button
+                onClick={async () => {
+                  if (!videoRef.current) return;
+                  try {
+                    if (document.pictureInPictureElement) {
+                      await document.exitPictureInPicture();
+                    } else if (videoRef.current.requestPictureInPicture) {
+                      await videoRef.current.requestPictureInPicture();
+                    }
+                  } catch (e) {
+                    console.debug(e);
+                  }
+                }}
+                title="Toggle Picture-in-Picture (P)"
+                className="bg-white/90 rounded-full p-2 shadow"
+              >
+                PiP
+              </button>
+
+              <button
+                onClick={() => setSelectedVideo(null)}
+                className="bg-white/90 rounded-full p-2 shadow"
+                aria-label="Close video"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Floating Elements Background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div
@@ -223,8 +414,11 @@ export default function WriterPortfolio() {
         </div>
         <div className="container mx-auto px-4 relative z-10">
           <blockquote className="text-2xl lg:text-3xl text-center text-gray-700 font-light italic max-w-4xl mx-auto">
-            "Stories are the bridge between souls, transcending borders and
-            connecting humanity through shared emotions."
+            “It’s rare to read anything that feels this unique. A richly
+            imagined, ambitious, and suspenseful novel that is striking for its
+            deft juxtaposition of small, human moments with larger concerns
+            about decision making.” — A.H Mohammed, author of The Last Days at
+            Forcados High School BOOKS
           </blockquote>
         </div>
       </section>
@@ -456,12 +650,45 @@ export default function WriterPortfolio() {
               >
                 {/* Glow effect */}
 
-                {/* Image container */}
-                <img
-                  src={item.pic}
-                  alt=""
-                  className=" w-full h-100 object-cover transform group-hover:scale-105 transition-transform duration-500"
-                />
+                {/* Image or video thumbnail container */}
+                {item.video ? (
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() =>
+                      setSelectedVideo({ src: item.video, poster: item.pic })
+                    }
+                    onKeyDown={(e) =>
+                      e.key === "Enter" &&
+                      setSelectedVideo({ src: item.video, poster: item.pic })
+                    }
+                    className="w-full h-80 bg-black/5 flex items-center justify-center cursor-pointer relative"
+                  >
+                    <img
+                      src={item.pic}
+                      alt={item.caption}
+                      className="w-full h-80 object-cover transform group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-20 h-20 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
+                        <svg
+                          className="w-8 h-8 text-gray-800"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                        >
+                          <path d="M5 3v18l15-9L5 3z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <img
+                    src={item.pic}
+                    alt=""
+                    className=" w-full h-80 object-cover transform group-hover:scale-105 transition-transform duration-500"
+                  />
+                )}
 
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end">

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import ife from "../assets/IMG_7969.JPG";
 import man from "../assets/IMG_7970.JPG";
 import ven from "../assets/IMG_7971.JPG";
@@ -6,6 +6,9 @@ import helen from "../assets/IMG_7972.JPG";
 import ref from "../assets/IMG_7973.JPG";
 import un from "../assets/IMG_2884.JPG";
 import { ShoppingCart } from "lucide-react";
+import { CartContext } from "../context/CartContext";
+import { Link } from "react-router-dom";
+import booksData from "../data/books";
 
 const books = [
   {
@@ -53,6 +56,7 @@ const books = [
 ];
 
 const Realease = () => {
+  const { addItem } = useContext(CartContext);
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollRef = useRef(null);
   const itemsPerPage = 3;
@@ -85,6 +89,24 @@ const Realease = () => {
       return () => scrollElement.removeEventListener("scroll", handleScroll);
     }
   }, []);
+
+  const slugify = (s) =>
+    String(s)
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+
+  const findSlug = (title) => {
+    const s = slugify(title);
+    if (booksData[s]) return s;
+    const norm = title.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+    for (const k of Object.keys(booksData)) {
+      const t = booksData[k].title.toLowerCase();
+      if (t.includes(norm) || norm.includes(t)) return k;
+    }
+    return s;
+  };
 
   return (
     <>
@@ -157,11 +179,13 @@ const Realease = () => {
                 className="book-card w-[232px] min-w-[232px] relative bg-[#EEF2FF] rounded-lg shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden"
               >
                 <div className="relative overflow-hidden">
-                  <img
-                    src={item.image}
-                    alt=""
-                    className="book-image w-[232px] h-[250px] object-contain pt-2 relative mx-auto transition-transform duration-500"
-                  />
+                  <Link to={`/book/${findSlug(item.title)}`} className="block">
+                    <img
+                      src={item.image}
+                      alt=""
+                      className="book-image w-[232px] h-[250px] object-contain pt-2 relative mx-auto transition-transform duration-500"
+                    />
+                  </Link>
                   <span className="absolute text-[16px] text-[#4F46E5] non font-bold bg-[#EEF2FF] top-4 left-4 text-center px-3 py-1 rounded-full shadow-md">
                     {item.prize}
                   </span>
@@ -170,7 +194,12 @@ const Realease = () => {
                   <p className="text-[12px] non font-normal text-[#1C2024] mt-3 min-h-[48px]">
                     {item.dis}
                   </p>
-                  <button className="flex items-center justify-center bg-[#18181B] text-[#FFFFFF] gap-2 w-full h-[32px] mt-3 rounded-md hover:bg-[#4F46E5] transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md">
+                  <button
+                    onClick={() =>
+                      addItem({ title: item.title, price: item.prize, image: item.image })
+                    }
+                    className="flex items-center justify-center bg-[#18181B] text-[#FFFFFF] gap-2 w-full h-[32px] mt-3 rounded-md hover:bg-[#4F46E5] transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md"
+                  >
                     <ShoppingCart width={20} height={20} /> {item.but}
                   </button>
                 </div>

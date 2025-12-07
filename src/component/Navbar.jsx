@@ -1,10 +1,14 @@
 import { Search, ShoppingCart, User, BookOpen } from "lucide-react";
 import { Menu, X } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/ggg.JPG";
+import { CartContext } from "../context/CartContext";
 export const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const cart = useContext(CartContext);
+  const cartCount = cart?.count || 0;
+  const [cartOpen, setCartOpen] = useState(false);
 
   // const links = ["Homes", "About", "Shop", "Event", "Blog", "Contact us"];
 
@@ -67,7 +71,15 @@ export const Navbar = () => {
               to="/contact"
               className="text-[#696969] font-bold text-[16px] non uppercase"
             >
-              Contact us
+              Contact
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/interview"
+              className="text-[#696969] font-bold text-[16px] non uppercase"
+            >
+              Interview
             </Link>
           </li>
         </ul>
@@ -76,10 +88,76 @@ export const Navbar = () => {
         <div className="hidden md:flex items-center gap-10">
           <Search width={30} height={30} className="text-[#333333]" />
           <div className="relative">
-            <ShoppingCart width={30} height={30} className="text-[#333333]" />
-            <span className="text-[12px] w-[20px] h-[20px] absolute -top-1 right-[-6px] flex items-center justify-center text-[#fff] rounded-full bg-[#e4573d]">
-              0
-            </span>
+            <button
+              onClick={() => setCartOpen((s) => !s)}
+              className="relative"
+              aria-label="Open cart"
+            >
+              <ShoppingCart width={30} height={30} className="text-[#333333]" />
+              <span className="text-[12px] w-[20px] h-[20px] absolute -top-1 right-[-6px] flex items-center justify-center text-[#fff] rounded-full bg-[#e4573d]">
+                {cartCount}
+              </span>
+            </button>
+
+            {/* Cart dropdown */}
+            {cartOpen && (
+              <div className="absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-2xl border border-gray-100 p-4 z-40">
+                <h4 className="text-sm font-semibold mb-2">Your Cart</h4>
+                <div className="max-h-56 overflow-auto space-y-3">
+                  {cart?.items?.length ? (
+                    cart.items.map((it, i) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <img
+                          src={it.image}
+                          alt=""
+                          className="w-12 h-12 object-cover rounded"
+                        />
+                        <div className="flex-1">
+                          <div className="text-sm font-medium">{it.title}</div>
+                          <div className="text-xs text-gray-500">
+                            {it.price} · qty {it.qty}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => cart.removeItem(it.title)}
+                          className="text-xs text-red-600"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-sm text-gray-500">
+                      Your cart is empty
+                    </div>
+                  )}
+                </div>
+                {cart?.items?.length ? (
+                  <div className="mt-4 flex flex-col gap-3">
+                    <div className="flex items-center justify-between">
+                      <button
+                        onClick={() => cart.clearCart()}
+                        className="text-sm text-gray-600"
+                      >
+                        Clear
+                      </button>
+                      <Link
+                        to="/cart"
+                        className="px-3 py-2 bg-gray-100 rounded text-sm"
+                        onClick={() => setCartOpen(false)}
+                      >
+                        View Cart
+                      </Link>
+                    </div>
+                    <Link to="/cart">
+                      <button className="w-full px-4 py-2 bg-gray-900 text-white rounded">
+                        Checkout
+                      </button>
+                    </Link>
+                  </div>
+                ) : null}
+              </div>
+            )}
           </div>
           <User width={30} height={30} className="text-[#333333]" />
         </div>
@@ -93,6 +171,21 @@ export const Navbar = () => {
           <Menu width={28} height={28} />
         </button>
       </div>
+
+      {/* transient add-to-cart toast */}
+      {cart?.lastAdded && (
+        <div className="fixed top-20 right-6 z-50">
+          <div className="bg-white border rounded-lg shadow-lg px-4 py-3 flex items-center gap-3">
+            <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center text-gray-700">
+              ✓
+            </div>
+            <div>
+              <div className="text-sm font-semibold">Added to cart</div>
+              <div className="text-xs text-gray-500">{cart.lastAdded}</div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Mobile sidebar / dropdown */}
       {open && (
@@ -134,6 +227,7 @@ export const Navbar = () => {
                     to="/home"
                     className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
                     // style={{ animationDelay: `${idx * 100}ms` }}
+                    onClick={() => setOpen(false)}
                   >
                     Homes
                   </Link>
@@ -142,6 +236,7 @@ export const Navbar = () => {
                   <Link
                     to="/about"
                     className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
+                    onClick={() => setOpen(false)}
                   >
                     About
                   </Link>
@@ -150,6 +245,7 @@ export const Navbar = () => {
                   <Link
                     to="/shop"
                     className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
+                    onClick={() => setOpen(false)}
                   >
                     Shop
                   </Link>
@@ -158,6 +254,7 @@ export const Navbar = () => {
                   <Link
                     to="/event"
                     className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
+                    onClick={() => setOpen(false)}
                   >
                     Event
                   </Link>
@@ -166,6 +263,7 @@ export const Navbar = () => {
                   <Link
                     to="/Blog"
                     className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
+                    onClick={() => setOpen(false)}
                   >
                     Blog
                   </Link>
@@ -174,8 +272,18 @@ export const Navbar = () => {
                   <Link
                     to="/contact"
                     className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
+                    onClick={() => setOpen(false)}
                   >
-                    Contact us
+                    Contact
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/interview"
+                    className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
+                    onClick={() => setOpen(false)}
+                  >
+                    Contact
                   </Link>
                 </li>
 
@@ -202,13 +310,24 @@ export const Navbar = () => {
                 style={{ animationDelay: "600ms" }}
               >
                 <Search width={24} height={24} className="text-white" />
-                <div className="relative">
-                  <ShoppingCart width={24} height={24} className="text-white" />
-                  <span className="text-[12px] w-[18px] h-[18px] absolute -top-2 right-[-6px] flex items-center justify-center text-[#fff] rounded-full bg-[#e4573d]">
-                    0
-                  </span>
-                </div>
-                <User width={24} height={24} className="text-white" />
+                <Link to="/cart" onClick={() => setOpen(false)}>
+                  <div className="relative">
+                    <ShoppingCart
+                      width={24}
+                      height={24}
+                      className="text-white"
+                    />
+                    <span className="text-[12px] w-[18px] h-[18px] absolute -top-2 right-[-6px] flex items-center justify-center text-[#fff] rounded-full bg-[#e4573d]">
+                      {cartCount}
+                    </span>
+                  </div>
+                </Link>
+                <User
+                  width={24}
+                  height={24}
+                  className="text-white"
+                  onClick={() => setOpen(false)}
+                />
               </div>
             </div>
           </aside>

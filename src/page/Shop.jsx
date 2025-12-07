@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import ife from "../assets/IMG_7969.JPG";
 import man from "../assets/IMG_7970.JPG";
 import ven from "../assets/IMG_7971.JPG";
@@ -7,6 +7,9 @@ import ref from "../assets/IMG_7973.JPG";
 import un from "../assets/IMG_2884.JPG";
 import { ShoppingCart } from "lucide-react";
 import Footer from "../component/Footer";
+import { Link } from "react-router-dom";
+import booksData from "../data/books";
+import { CartContext } from "../context/CartContext";
 
 const books = [
   {
@@ -54,6 +57,29 @@ const books = [
 ];
 
 const Shop = () => {
+  const { addItem } = useContext(CartContext);
+  const slugify = (s) =>
+    String(s)
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+
+  const findSlug = (title) => {
+    const s = slugify(title);
+    if (booksData[s]) return s;
+    // fallback: try to match by title keywords
+    const norm = title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+    for (const k of Object.keys(booksData)) {
+      const t = booksData[k].title.toLowerCase();
+      if (t.includes(norm) || norm.includes(t)) return k;
+    }
+    return s;
+  };
+
   return (
     <>
       <style>
@@ -108,23 +134,39 @@ const Shop = () => {
               className="book-card w-full relative bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 overflow-hidden border border-gray-100"
             >
               <div className="relative overflow-hidden bg-gradient-to-br from-[#EEF2FF] to-[#E0E7FF] p-6">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="book-image w-full h-[320px] object-contain relative mx-auto transition-transform duration-500"
-                />
+                <Link to={`/book/${findSlug(item.title)}`} className="block">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="book-image w-full h-[320px] object-contain relative mx-auto transition-transform duration-500"
+                  />
+                </Link>
                 <span className="absolute text-[18px] text-white non font-bold bg-[#4F46E5] top-6 left-6 text-center px-4 py-2 rounded-full shadow-lg">
                   {item.prize}
                 </span>
               </div>
               <div className="p-6">
                 <h3 className="text-[20px] non font-bold text-[#1C2024] mb-3">
-                  {item.title}
+                  <Link
+                    to={`/book/${findSlug(item.title)}`}
+                    className="hover:underline"
+                  >
+                    {item.title}
+                  </Link>
                 </h3>
                 <p className="text-[14px] non font-normal text-[#6B7280] leading-relaxed mb-6 min-h-[60px]">
                   {item.dis}
                 </p>
-                <button className="flex items-center justify-center bg-[#18181B] text-[#FFFFFF] gap-2 w-full h-[44px] rounded-lg hover:bg-[#4F46E5] transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md font-medium">
+                <button
+                  onClick={() =>
+                    addItem({
+                      title: item.title,
+                      price: item.prize,
+                      image: item.image,
+                    })
+                  }
+                  className="flex items-center justify-center bg-[#18181B] text-[#FFFFFF] gap-2 w-full h-[44px] rounded-lg hover:bg-[#4F46E5] transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md font-medium"
+                >
                   <ShoppingCart width={20} height={20} /> {item.but}
                 </button>
               </div>
