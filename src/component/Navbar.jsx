@@ -283,7 +283,7 @@ export const Navbar = () => {
                     className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
                     onClick={() => setOpen(false)}
                   >
-                    Contact
+                    Interview 
                   </Link>
                 </li>
 
