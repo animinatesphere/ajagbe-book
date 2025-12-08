@@ -364,8 +364,7 @@ export default function WriterPortfolio() {
               </div>
 
               <p className="text-xl lg:text-2xl text-gray-600 leading-relaxed animate-slide-up animation-delay-200 font-light">
-                Crafting powerful narratives that bridge continents and touch
-                hearts across the globe
+                My books are meant as sweet escapes where the passionate, yet tender love is undeniable.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-slide-up animation-delay-400 pt-4">
