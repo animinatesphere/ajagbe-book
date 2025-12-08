@@ -18,6 +18,7 @@ import InterviewPage from "./page/InterviewPage";
 import BookCoverReveal from "./page/BookCoverReveal";
 import GiveawayPage from "./page/GiveawayPage";
 import SignedBooksPage from "./page/SignedBooksPage";
+import WordPressBlog from "./page/WordPressBlog";
 
 const App = () => {
   return (
@@ -29,6 +30,7 @@ const App = () => {
         <Route path="/home" element={<Home />} />
         <Route path="/about" element={<WriterPortfolio />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/blog" element={<WordPressBlog />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/book/:slug" element={<BookDetails />} />
         <Route path="/cart" element={<Cart />} />
