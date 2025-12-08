@@ -8,68 +8,29 @@ import un from "../assets/IMG_2884.JPG";
 import { ShoppingCart } from "lucide-react";
 
 const books = [
-  {
-    image: ife,
-    prize: "$3",
-    title: "Letter to ife",
-    dis: "a unique anthology of epistolary poetry-poems in the form of letters",
-    but: "Add to cart",
-  },
-  {
-    image: man,
-    prize: "$2",
-    title: "Mandem:Poem in pidgin English",
-    dis: "Pidgin English na one of di main language wey plenty naija people dey yarn",
-    but: "Add to cart",
-  },
-  {
-    image: ven,
-    prize: "$3",
-    title: "Vendetta",
-    dis: "nonee",
-    but: "Add to cart",
-  },
-  {
-    image: helen,
-    prize: "$4",
-    title: "What Happened to Helen ",
-    dis: "A bestselling author and story writer needed a break from her marriage",
-    but: "Add to cart",
-  },
-  {
-    image: ref,
-    prize: "$4",
-    title: "Reflection:Rulers and Preys",
-    dis: "the result is an electrifying vision of how exceedingly violent governing ",
-    but: "Add to cart",
-  },
-  {
-    image: un,
-    prize: "$4",
-    title: "Uder the Milky Way",
-    dis: "This is a book earth about us",
-    but: "Add to cart",
-  },
+  { image: ife, prize: "₦3", title: "Letter to ife", dis: "a unique anthology of epistolary poetry-poems in the form of letters", but: "Add to cart" },
+  { image: man, prize: "₦2", title: "Mandem:Poem in pidgin English", dis: "Pidgin English na one of di main language wey plenty naija people dey yarn", but: "Add to cart" },
+  { image: ven, prize: "₦3", title: "Vendetta", dis: "nonee", but: "Add to cart" },
+  { image: helen, prize: "₦4", title: "What Happened to Helen", dis: "A bestselling author and story writer needed a break from her marriage", but: "Add to cart" },
+  { image: ref, prize: "₦4", title: "Reflection:Rulers and Preys", dis: "the result is an electrifying vision of how exceedingly violent governing", but: "Add to cart" },
+  { image: un, prize: "₦4", title: "Under the Milky Way", dis: "This is a book earth about us", but: "Add to cart" },
 ];
 
 import { CartContext } from "../context/CartContext";
 import { Link } from "react-router-dom";
 import booksData from "../data/books";
+import { supabase } from "../lib/supabaseClient";
 
 const Best = () => {
   const { addItem } = useContext(CartContext);
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollRef = useRef(null);
   const itemsPerPage = 3;
-  const totalPages = Math.ceil(books.length / itemsPerPage);
 
   const scrollToPage = (pageIndex) => {
     if (scrollRef.current) {
       const cardWidth = 252; // 232px + 20px gap
-      scrollRef.current.scrollTo({
-        left: pageIndex * cardWidth * itemsPerPage,
-        behavior: "smooth",
-      });
+      scrollRef.current.scrollTo({ left: pageIndex * cardWidth * itemsPerPage, behavior: "smooth" });
       setCurrentIndex(pageIndex);
     }
   };
@@ -108,6 +69,29 @@ const Best = () => {
     }
     return s;
   };
+
+  const [dbBooks, setDbBooks] = useState([]);
+  const [, setLoading] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetch = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase.from("books").select("*");
+        if (error) throw error;
+        if (mounted && Array.isArray(data) && data.length) setDbBooks(data);
+      } catch (e) {
+        console.debug("Could not fetch books from Supabase:", e);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    fetch();
+    return () => { mounted = false; };
+  }, []);
+
+  const itemsToRender = dbBooks.length ? dbBooks : books;
 
   return (
     <>
@@ -168,39 +152,21 @@ const Best = () => {
 
       {/* container */}
       <div className="pt-5 pb-11 max-w-[1400px] mx-auto px-4">
-        <p className="text-[24px] text-[#1C2024] non text-center font-bold mb-8">
-          Best Seller Books
-        </p>
+        <p className="text-[24px] text-[#1C2024] non text-center font-bold mb-8">Best Seller Books</p>
 
         <div ref={scrollRef} className="scroll-container overflow-x-auto pb-4">
           <div className="flex gap-5 justify-center min-w-max mx-auto w-fit">
-            {books.map((item, index) => (
-              <div
-                key={index}
-                className="book-card w-[232px] min-w-[232px] relative bg-[#EEF2FF] rounded-lg shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden"
-              >
+            {itemsToRender.map((item, index) => (
+              <div key={index} className="book-card w-[232px] min-w-[232px] relative bg-[#EEF2FF] rounded-lg shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden">
                 <div className="relative overflow-hidden">
-                  <Link to={`/book/${findSlug(item.title)}`} className="block">
-                    <img
-                      src={item.image}
-                      alt=""
-                      className="book-image w-[232px] h-[250px] object-contain pt-2 relative mx-auto transition-transform duration-500"
-                    />
+                  <Link to={`/book/${item.slug || findSlug(item.title)}`} className="block">
+                    <img src={item.image_url || item.image} alt="" className="book-image w-[232px] h-[250px] object-contain pt-2 relative mx-auto transition-transform duration-500" />
                   </Link>
-                  <span className="absolute text-[16px] text-[#4F46E5] non font-bold bg-[#EEF2FF] top-4 left-4 text-center px-3 py-1 rounded-full shadow-md">
-                    {item.prize}
-                  </span>
+                  <span className="absolute text-[16px] text-[#4F46E5] non font-bold bg-[#EEF2FF] top-4 left-4 text-center px-3 py-1 rounded-full shadow-md">{item.price || item.prize}</span>
                 </div>
                 <div className="px-4 pb-4">
-                  <p className="text-[12px] non font-normal text-[#1C2024] mt-3 min-h-[48px]">
-                    {item.dis}
-                  </p>
-                  <button
-                    onClick={() =>
-                      addItem({ title: item.title, price: item.prize, image: item.image })
-                    }
-                    className="flex items-center justify-center bg-[#18181B] text-[#FFFFFF] gap-2 w-full h-[32px] mt-3 rounded-md hover:bg-[#4F46E5] transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md"
-                  >
+                  <p className="text-[12px] non font-normal text-[#1C2024] mt-3 min-h-[48px]">{item.dis}</p>
+                  <button onClick={() => addItem({ title: item.title, price: item.price || item.prize, image: item.image_url || item.image })} className="flex items-center justify-center bg-[#18181B] text-[#FFFFFF] gap-2 w-full h-[32px] mt-3 rounded-md hover:bg-[#4F46E5] transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md">
                     <ShoppingCart width={20} height={20} /> {item.but}
                   </button>
                 </div>
@@ -210,20 +176,16 @@ const Best = () => {
         </div>
 
         {/* Pagination Dots */}
-        <div className="flex justify-center items-center gap-3 mt-6">
-          {Array.from({ length: totalPages }).map((_, index) => (
-            <button
-              key={index}
-              onClick={() => scrollToPage(index)}
-              className={`dot w-3 h-3 rounded-full transition-all duration-300 ${
-                currentIndex === index
-                  ? "bg-[#4F46E5] active"
-                  : "bg-gray-300 hover:bg-gray-400"
-              }`}
-              aria-label={`Go to page ${index + 1}`}
-            />
-          ))}
-        </div>
+        {(() => {
+          const totalPages = Math.max(1, Math.ceil(itemsToRender.length / itemsPerPage));
+          return (
+            <div className="flex justify-center items-center gap-3 mt-6">
+              {Array.from({ length: totalPages }).map((_, index) => (
+                <button key={index} onClick={() => scrollToPage(index)} className={`dot w-3 h-3 rounded-full transition-all duration-300 ${currentIndex === index ? "bg-[#4F46E5] active" : "bg-gray-300 hover:bg-gray-400"}`} aria-label={`Go to page ${index + 1}`} />
+              ))}
+            </div>
+          );
+        })()}
       </div>
       {/* end of container */}
     </>

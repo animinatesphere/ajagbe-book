@@ -417,8 +417,8 @@ export default function WriterPortfolio() {
             “It’s rare to read anything that feels this unique. A richly
             imagined, ambitious, and suspenseful novel that is striking for its
             deft juxtaposition of small, human moments with larger concerns
-            about decision making.” — A.H Mohammed, author of The Last Days at
-            Forcados High School BOOKS
+            about decision making.” <br /> — A.H Mohammed, author of The Last
+            Days at Forcados High School BOOKS
           </blockquote>
         </div>
       </section>

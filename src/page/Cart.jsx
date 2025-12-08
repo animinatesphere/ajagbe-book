@@ -1,7 +1,8 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { CartContext } from "../context/CartContext";
 import { ShoppingCart } from "lucide-react";
 import Footer from "../component/Footer";
+import OrderForm from "../component/OrderForm";
 
 const parsePrice = (p) => {
   if (!p) return 0;
@@ -12,6 +13,8 @@ const parsePrice = (p) => {
 export default function Cart() {
   const { items, increaseQty, decreaseQty, removeItem, clearCart, count } =
     useContext(CartContext);
+
+  const [showOrderForm, setShowOrderForm] = useState(false);
 
   const subtotal = items.reduce(
     (s, it) => s + parsePrice(it.price) * (it.qty || 1),
@@ -65,10 +68,7 @@ export default function Cart() {
                           <div className="flex items-center justify-between">
                             <h3 className="font-semibold">{it.title}</h3>
                             <div className="text-gray-700 font-medium">
-                              $
-                              {(parsePrice(it.price) * (it.qty || 1)).toFixed(
-                                2
-                              )}
+                              ₦{(parsePrice(it.price) * (it.qty || 1)).toFixed(2)}
                             </div>
                           </div>
                           <p className="text-sm text-gray-500">{it.price}</p>
@@ -106,14 +106,14 @@ export default function Cart() {
                 <h4 className="text-lg font-semibold mb-4">Order Summary</h4>
                 <div className="flex justify-between text-gray-700 mb-2">
                   <div>Subtotal</div>
-                  <div className="font-medium">${subtotal.toFixed(2)}</div>
+                  <div className="font-medium">₦{subtotal.toFixed(2)}</div>
                 </div>
                 <div className="flex justify-between text-gray-500 mb-4">
                   <div>Shipping</div>
                   <div>Calculated at checkout</div>
                 </div>
                 <div className="border-t pt-4 mt-4">
-                  <button className="w-full px-4 py-3 bg-gray-900 text-white rounded-lg font-semibold">
+                  <button onClick={() => setShowOrderForm(true)} className="w-full px-4 py-3 bg-gray-900 text-white rounded-lg font-semibold">
                     Proceed to Checkout
                   </button>
                 </div>
@@ -123,6 +123,9 @@ export default function Cart() {
         </div>
       </div>
       <Footer />
+    {showOrderForm && (
+      <OrderForm open={showOrderForm} onClose={() => setShowOrderForm(false)} />
+    )}
     </>
   );
 }

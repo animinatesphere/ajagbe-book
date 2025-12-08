@@ -1,5 +1,12 @@
 import React from "react";
-import { BookOpen, Heart } from "lucide-react";
+import {
+  BookOpen,
+  Facebook,
+  Heart,
+  Instagram,
+  MessageCircle,
+  Twitter,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
@@ -123,6 +130,26 @@ const Footer = () => {
               <li className="text-gray-400 non">
                 <span className="block">MMEC, Mullana - 133207</span>
               </li>
+              <div className="flex items  gap-3">
+                <Link to="https://x.com/the_ayodimeji1?s=21">
+                  <Twitter width={16} height={16} />
+                </Link>
+                <Link to="https://www.instagram.com/the_ayodimeji1?igsh=MWU2NXJzd3pkcGFz&utm_source=qr">
+                  <Instagram width={16} height={16} />
+                </Link>
+                <Link
+                  to="
+https://www.facebook.com/share/1E9AeKKGRw/?mibextid=wwXIfr"
+                >
+                  <Facebook width={16} height={16} />
+                </Link>
+                <Link
+                  to="
+https://www.threads.com/@the_ayodimeji1?igshid=NTc4MTIwNjQ2YQ=="
+                >
+                  <MessageCircle width={16} height={16} />
+                </Link>
+              </div>
             </ul>
           </div>
 

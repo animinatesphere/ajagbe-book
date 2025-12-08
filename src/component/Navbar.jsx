@@ -82,10 +82,26 @@ export const Navbar = () => {
               Interview
             </Link>
           </li>
+          <li>
+            <Link
+              to="/giveaway"
+              className="text-[#696969] font-bold text-[16px] non uppercase"
+            >
+              Giveaway
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/signed-book"
+              className="text-[#696969] font-bold text-[16px] non uppercase"
+            >
+              Signed Book
+            </Link>
+          </li>
         </ul>
 
         {/* desktop actions (hidden on mobile) */}
-        <div className="hidden md:flex items-center gap-10">
+        <div className="hidden lg:flex items-center gap-10">
           <Search width={30} height={30} className="text-[#333333]" />
           <div className="relative">
             <button
@@ -286,7 +302,24 @@ export const Navbar = () => {
                     Contact
                   </Link>
                 </li>
-
+                <li>
+                  <Link
+                    to="/giveaway"
+                    className="text-white font-bold text-[16px] non uppercase"
+                    onClick={() => setOpen(false)}
+                  >
+                    Giveaway
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/signed-book"
+                    className="text-white font-bold text-[16px] non uppercase"
+                    onClick={() => setOpen(false)}
+                  >
+                    Signed Book
+                  </Link>
+                </li>
                 {/* {links.map((label, idx) => (
                   <li
                     key={label}

@@ -90,7 +90,7 @@ export default function BookCoverReveal() {
                     <Calendar className="w-4 h-4" />
                     DECEMBER 23
                   </div>
-                  <h2 className="text-6xl font-bold mb-6 leading-tight animate-fade-in">
+                  <h2 className="text-[20px] sm:text-[25px] md:text-[30px] lg:text-[40px] font-bold mb-6 leading-tight animate-fade-in">
                     Upcoming
                     <br />
                     Book Cover
@@ -111,10 +111,10 @@ export default function BookCoverReveal() {
                         className="bg-white/20 backdrop-blur-sm rounded-xl p-5 text-center hover:bg-white/30 transition-all duration-300 hover:scale-110 cursor-pointer transform"
                         style={{ animationDelay: `${idx * 0.1}s` }}
                       >
-                        <div className="text-4xl font-bold tabular-nums">
+                        <div className="text-[8px] sm:text-[10px] md:text-[12px]  lg:text-[14px] font-bold tabular-nums">
                           {String(item.value).padStart(2, "0")}
                         </div>
-                        <div className="text-xs uppercase mt-2 opacity-90 font-semibold tracking-wider">
+                        <div className="text-[6px] sm:text-[8px] md:text-[10px] lg:text-[12px] uppercase mt-2 opacity-90 font-semibold tracking-wider">
                           {item.label}
                         </div>
                       </div>

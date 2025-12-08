@@ -10,46 +10,48 @@ import Footer from "../component/Footer";
 import { Link } from "react-router-dom";
 import booksData from "../data/books";
 import { CartContext } from "../context/CartContext";
+import { supabase } from "../lib/supabaseClient";
+import { useEffect, useState } from "react";
 
 const books = [
   {
     image: ife,
-    prize: "$3",
+    prize: "₦3",
     title: "Letter to ife",
     dis: "a unique anthology of epistolary poetry-poems in the form of letters",
     but: "Add to cart",
   },
   {
     image: man,
-    prize: "$2",
+    prize: "₦2",
     title: "Mandem:Poem in pidgin English",
     dis: "Pidgin English na one of di main language wey plenty naija people dey yarn",
     but: "Add to cart",
   },
   {
     image: ven,
-    prize: "$3",
+    prize: "₦3",
     title: "Vendetta",
     dis: "nonee",
     but: "Add to cart",
   },
   {
     image: helen,
-    prize: "$4",
+    prize: "₦4",
     title: "What Happened to Helen ",
     dis: "A bestselling author and story writer needed a break from her marriage",
     but: "Add to cart",
   },
   {
     image: ref,
-    prize: "$4",
+    prize: "₦4",
     title: "Reflection:Rulers and Preys",
     dis: "the result is an electrifying vision of how exceedingly violent governing ",
     but: "Add to cart",
   },
   {
     image: un,
-    prize: "$4",
+    prize: "₦4",
     title: "Uder the Milky Way",
     dis: "This is a book earth about us",
     but: "Add to cart",
@@ -79,6 +81,31 @@ const Shop = () => {
     }
     return s;
   };
+
+  const [dbBooks, setDbBooks] = useState([]);
+  const [, setLoading] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetch = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase.from("books").select("*");
+        if (error) throw error;
+        if (mounted && Array.isArray(data) && data.length) setDbBooks(data);
+      } catch (e) {
+        console.debug("Could not fetch books from Supabase:", e);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    fetch();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const itemsToRender = dbBooks.length ? dbBooks : books;
 
   return (
     <>
@@ -128,41 +155,38 @@ const Shop = () => {
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {books.map((item, index) => (
+          {itemsToRender.map((item, index) => (
             <div
               key={index}
               className="book-card w-full relative bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 overflow-hidden border border-gray-100"
             >
               <div className="relative overflow-hidden bg-gradient-to-br from-[#EEF2FF] to-[#E0E7FF] p-6">
-                <Link to={`/book/${findSlug(item.title)}`} className="block">
+                <Link to={`/book/${item.slug || findSlug(item.title)}`} className="block">
                   <img
-                    src={item.image}
+                    src={item.image_url || item.image}
                     alt={item.title}
                     className="book-image w-full h-[320px] object-contain relative mx-auto transition-transform duration-500"
                   />
                 </Link>
                 <span className="absolute text-[18px] text-white non font-bold bg-[#4F46E5] top-6 left-6 text-center px-4 py-2 rounded-full shadow-lg">
-                  {item.prize}
+                  {item.price || item.prize}
                 </span>
               </div>
               <div className="p-6">
                 <h3 className="text-[20px] non font-bold text-[#1C2024] mb-3">
-                  <Link
-                    to={`/book/${findSlug(item.title)}`}
-                    className="hover:underline"
-                  >
+                  <Link to={`/book/${item.slug || findSlug(item.title)}`} className="hover:underline">
                     {item.title}
                   </Link>
                 </h3>
                 <p className="text-[14px] non font-normal text-[#6B7280] leading-relaxed mb-6 min-h-[60px]">
-                  {item.dis}
+                  {item.description || item.dis}
                 </p>
                 <button
                   onClick={() =>
                     addItem({
                       title: item.title,
-                      price: item.prize,
-                      image: item.image,
+                      price: item.price || item.prize,
+                      image: item.image_url || item.image,
                     })
                   }
                   className="flex items-center justify-center bg-[#18181B] text-[#FFFFFF] gap-2 w-full h-[44px] rounded-lg hover:bg-[#4F46E5] transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md font-medium"

@@ -1,15 +1,43 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import books from "../data/books";
 import { CartContext } from "../context/CartContext";
 import Footer from "../component/Footer";
+import { supabase } from "../lib/supabaseClient";
 
 export default function BookDetails() {
   const { slug } = useParams();
   const book = books[slug];
+  const [dbBook, setDbBook] = useState(null);
+  const [loading, setLoading] = useState(false);
   const { addItem } = useContext(CartContext);
 
-  if (!book) {
+  useEffect(() => {
+    let mounted = true;
+    const fetchBook = async () => {
+      if (book) return; // we have local data
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from("books")
+          .select("*")
+          .eq("slug", slug)
+          .limit(1);
+        if (error) throw error;
+        if (mounted && Array.isArray(data) && data.length) setDbBook(data[0]);
+      } catch (e) {
+        console.debug("Error fetching book by slug:", e);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    fetchBook();
+    return () => { mounted = false; };
+  }, [slug, book]);
+
+  const displayBook = book || dbBook;
+
+  if (!displayBook && !loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -23,7 +51,7 @@ export default function BookDetails() {
   }
 
   const handleAdd = () => {
-    addItem({ title: book.title, price: book.price, image: book.image });
+    addItem({ title: displayBook.title, price: displayBook.price || displayBook.prize, image: displayBook.image_url || displayBook.image });
   };
 
   return (
@@ -34,8 +62,8 @@ export default function BookDetails() {
             <div className="grid grid-cols-1 lg:grid-cols-3">
               <div className="p-8 flex items-center justify-center bg-gradient-to-br from-gray-100 to-white">
                 <img
-                  src={book.image}
-                  alt={book.title}
+                  src={displayBook.image_url || displayBook.image}
+                  alt={displayBook.title}
                   className="w-full max-w-sm object-cover rounded"
                 />
               </div>
@@ -43,13 +71,13 @@ export default function BookDetails() {
                 <Link to="/shop" className="text-sm text-gray-500">
                   ← Back to shop
                 </Link>
-                <h1 className="text-4xl font-bold mt-3">{book.title}</h1>
+                <h1 className="text-4xl font-bold mt-3">{displayBook.title}</h1>
                 <div className="mt-4 text-gray-700 text-lg">
-                  {book.description}
+                  {displayBook.description || displayBook.dis}
                 </div>
 
                 <div className="mt-6 flex items-center gap-4">
-                  <div className="text-2xl font-semibold">{book.price}</div>
+                  <div className="text-2xl font-semibold">{displayBook.price || displayBook.prize}</div>
                   <button
                     onClick={handleAdd}
                     className="px-5 py-3 bg-gray-900 text-white rounded-lg"
