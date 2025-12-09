@@ -18,7 +18,7 @@ export default function OrderForm({ open, onClose }) {
     return s + parseFloat(n || "0") * (it.qty || 1);
   }, 0);
 
-  const transportFee = delivery === "physical" ? 2 : 0;
+  const transportFee = delivery === "physical" ? 1000 : 0;
   const total = subtotal + transportFee;
 
   const toast = useToast();

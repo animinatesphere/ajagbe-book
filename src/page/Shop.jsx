@@ -161,7 +161,10 @@ const Shop = () => {
               className="book-card w-full relative bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 overflow-hidden border border-gray-100"
             >
               <div className="relative overflow-hidden bg-gradient-to-br from-[#EEF2FF] to-[#E0E7FF] p-6">
-                <Link to={`/book/${item.slug || findSlug(item.title)}`} className="block">
+                <Link
+                  to={`/book/${item.slug || findSlug(item.title)}`}
+                  className="block"
+                >
                   <img
                     src={item.image_url || item.image}
                     alt={item.title}
@@ -169,17 +172,20 @@ const Shop = () => {
                   />
                 </Link>
                 <span className="absolute text-[18px] text-white non font-bold bg-[#4F46E5] top-6 left-6 text-center px-4 py-2 rounded-full shadow-lg">
-                  {item.price || item.prize}
+                  {`₦${item.price || item.prize}`}
                 </span>
               </div>
               <div className="p-6">
                 <h3 className="text-[20px] non font-bold text-[#1C2024] mb-3">
-                  <Link to={`/book/${item.slug || findSlug(item.title)}`} className="hover:underline">
+                  <Link
+                    to={`/book/${item.slug || findSlug(item.title)}`}
+                    className="hover:underline"
+                  >
                     {item.title}
                   </Link>
                 </h3>
                 <p className="text-[14px] non font-normal text-[#6B7280] leading-relaxed mb-6 min-h-[60px]">
-                  {item.description || item.dis}
+                  {(item.description || item.dis || "").substring(0, 50)}...
                 </p>
                 <button
                   onClick={() =>
