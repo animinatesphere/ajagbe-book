@@ -358,7 +358,7 @@ export const Navbar = () => {
                   </div>
                 </Link>
                           <Link to="/admin/login">
-            <User width={30} height={30} className="text-[#333333]" />
+            <User width={30} height={30} className="text-white" />
           </Link>
               </div>
             </div>
