@@ -213,23 +213,27 @@ const InterviewPage = () => {
 
               <div className="flex items-center justify-center gap-12 pt-8">
                 <div className="text-center">
-                  <div className="text-5xl font-bold text-gray-900">
+                  <div className="text-[14px] sm:text-[16px] md:text-[24px] lg:text-[28px] font-bold text-gray-900">
                     {interviews.length}+
                   </div>
-                  <div className="text-sm text-gray-500 mt-1 font-medium">
+                  <div className="text-[12px] sm:text-[14px] md:text-[16px] lg:text-[18px] text-gray-500 mt-1 font-medium">
                     Interviews
                   </div>
                 </div>
                 <div className="w-px h-16 bg-gray-200"></div>
                 <div className="text-center">
-                  <div className="text-5xl font-bold text-gray-900">6+</div>
+                  <div className="text-[14px] sm:text-[16px] md:text-[24px] lg:text-[28px] font-bold text-gray-900">
+                    6+
+                  </div>
                   <div className="text-sm text-gray-500 mt-1 font-medium">
                     Platforms
                   </div>
                 </div>
                 <div className="w-px h-16 bg-gray-200"></div>
                 <div className="text-center">
-                  <div className="text-5xl font-bold text-gray-900">5</div>
+                  <div className="text-[14px] sm:text-[16px] md:text-[24px] lg:text-[28px]  font-bold text-gray-900">
+                    5
+                  </div>
                   <div className="text-sm text-gray-500 mt-1 font-medium">
                     Years
                   </div>

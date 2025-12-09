@@ -175,7 +175,9 @@ export const Navbar = () => {
               </div>
             )}
           </div>
-          <User width={30} height={30} className="text-[#333333]" />
+          <Link to="/admin/login">
+            <User width={30} height={30} className="text-[#333333]" />
+          </Link>
         </div>
 
         {/* hamburger for mobile */}
@@ -299,7 +301,7 @@ export const Navbar = () => {
                     className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
                     onClick={() => setOpen(false)}
                   >
-                    Interview 
+                    Interview
                   </Link>
                 </li>
                 <li>
