@@ -357,12 +357,9 @@ export const Navbar = () => {
                     </span>
                   </div>
                 </Link>
-                <User
-                  width={24}
-                  height={24}
-                  className="text-white"
-                  onClick={() => setOpen(false)}
-                />
+                          <Link to="/admin/login">
+            <User width={30} height={30} className="text-[#333333]" />
+          </Link>
               </div>
             </div>
           </aside>
