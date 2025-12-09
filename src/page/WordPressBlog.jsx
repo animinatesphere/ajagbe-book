@@ -377,35 +377,6 @@ export default function WordPressBlog() {
         </div>
       )}
 
-      {/* Footer */}
-      <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white mt-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center">
-            <h3 className="text-2xl font-bold mb-3">Stay Updated</h3>
-            <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
-              Subscribe to our newsletter for the latest articles and insights
-              delivered straight to your inbox.
-            </p>
-            <div className="flex justify-center">
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-1 flex items-center max-w-md w-full">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="flex-1 bg-transparent px-4 py-3 text-white placeholder-gray-400 focus:outline-none"
-                />
-                <button className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg font-semibold hover:shadow-lg transition-all">
-                  Subscribe
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="mt-12 pt-8 border-t border-gray-700 text-center text-gray-400">
-            <p>
-              © 2024 Your Company. Powered by Supabase + React + Tailwind CSS
-            </p>
-          </div>
-        </div>
-      </footer>
 
       <style jsx>{`
         @keyframes fadeIn {
