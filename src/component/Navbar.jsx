@@ -331,15 +331,12 @@ export const Navbar = () => {
                   </div>
                   <span className="text-xs">Cart</span>
                 </Link>
-
-                <Link
-                  to="/admin/login"
+                <User
+                  width={24}
+                  height={24}
+                  className="text-white"
                   onClick={() => setOpen(false)}
-                  className="flex flex-col items-center gap-2 p-3 hover:bg-white/10 rounded-lg transition-colors"
-                >
-                  <User className="w-6 h-6" />
-                  <span className="text-xs">Account</span>
-                </Link>
+                />
               </div>
             </div>
           </aside>
