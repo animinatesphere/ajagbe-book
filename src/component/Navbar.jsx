@@ -1,373 +1,366 @@
 import { Search, ShoppingCart, User, BookOpen } from "lucide-react";
 import { Menu, X } from "lucide-react";
-import React, { useState, useContext } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useContext, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/ggg.JPG";
 import { CartContext } from "../context/CartContext";
+
 export const Navbar = () => {
   const [open, setOpen] = useState(false);
   const cart = useContext(CartContext);
   const cartCount = cart?.count || 0;
   const [cartOpen, setCartOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
 
-  // const links = ["Homes", "About", "Shop", "Event", "Blog", "Contact us"];
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [open]);
 
   return (
     <>
-      {/* container */}
-      <div className="flex fixed w-full z-10 items-center justify-between p-2 md:p-4 bg-[#fff] shadow-lg">
-        {/* logo */}
-        <img
-          src={logo}
-          alt=""
-          className="max-w-[100px] h-[100px] object-contain"
-        />
-        {/* logo */}
+      {/* Main Navbar */}
+      <nav
+        className={`fixed top-0 w-full z-40 transition-all duration-300 ${
+          scrolled
+            ? "bg-white/95 backdrop-blur-md shadow-xl py-2"
+            : "bg-white shadow-lg py-3"
+        }`}
+      >
+        <div className="container mx-auto px-4 lg:px-6">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <Link to="/home" className="flex-shrink-0 group">
+              <img
+                src={logo}
+                alt="Logo"
+                className={`object-contain transition-all duration-300 ${
+                  scrolled ? "max-w-[80px] h-[80px]" : "max-w-[100px] h-[100px]"
+                } group-hover:scale-105`}
+              />
+            </Link>
 
-        {/* desktop links (hidden on mobile) */}
-        <ul className="hidden md:flex items-center gap-10">
-          <li>
-            <Link
-              to="/home"
-              className="text-[#696969] font-bold text-[16px] non uppercase"
-            >
-              Homes
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/about"
-              className="text-[#696969] font-bold text-[16px] non uppercase"
-            >
-              About
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/shop"
-              className="text-[#696969] font-bold text-[16px] non uppercase"
-            >
-              Shop
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/event"
-              className="text-[#696969] font-bold text-[16px] non uppercase"
-            >
-              Event
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/blog"
-              className="text-[#696969] font-bold text-[16px] non uppercase"
-            >
-              Blog
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/contact"
-              className="text-[#696969] font-bold text-[16px] non uppercase"
-            >
-              Contact
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/interview"
-              className="text-[#696969] font-bold text-[16px] non uppercase"
-            >
-              Interview
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/giveaway"
-              className="text-[#696969] font-bold text-[16px] non uppercase"
-            >
-              Giveaway
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/signed-book"
-              className="text-[#696969] font-bold text-[16px] non uppercase"
-            >
-              Signed Book
-            </Link>
-          </li>
-        </ul>
+            {/* Desktop Navigation Links */}
+            <ul className="hidden xl:flex items-center gap-8">
+              {[
+                { to: "/home", label: "Home" },
+                { to: "/about", label: "About" },
+                { to: "/shop", label: "Shop" },
+                { to: "/event", label: "Event" },
+                { to: "/blog", label: "Blog" },
+                { to: "/contact", label: "Contact" },
+                { to: "/interview", label: "Interview" },
+                { to: "/giveaway", label: "Giveaway" },
+                { to: "/signed-book", label: "Signed Book" },
+              ].map((link) => (
+                <li key={link.to}>
+                  <Link
+                    to={link.to}
+                    className="text-gray-700 font-semibold text-sm uppercase tracking-wide hover:text-gray-900 transition-colors relative group py-2"
+                  >
+                    {link.label}
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gray-900 transition-all duration-300 group-hover:w-full"></span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
 
-        {/* desktop actions (hidden on mobile) */}
-        <div className="hidden lg:flex items-center gap-10">
-          <Search width={30} height={30} className="text-[#333333]" />
-          <div className="relative">
-            <button
-              onClick={() => setCartOpen((s) => !s)}
-              className="relative"
-              aria-label="Open cart"
-            >
-              <ShoppingCart width={30} height={30} className="text-[#333333]" />
-              <span className="text-[12px] w-[20px] h-[20px] absolute -top-1 right-[-6px] flex items-center justify-center text-[#fff] rounded-full bg-[#e4573d]">
-                {cartCount}
-              </span>
-            </button>
+            {/* Desktop Actions */}
+            <div className="hidden lg:flex items-center gap-6">
+              <button
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                aria-label="Search"
+              >
+                <Search className="w-6 h-6 text-gray-700" />
+              </button>
 
-            {/* Cart dropdown */}
-            {cartOpen && (
-              <div className="absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-2xl border border-gray-100 p-4 z-40">
-                <h4 className="text-sm font-semibold mb-2">Your Cart</h4>
-                <div className="max-h-56 overflow-auto space-y-3">
-                  {cart?.items?.length ? (
-                    cart.items.map((it, i) => (
-                      <div key={i} className="flex items-center gap-3">
-                        <img
-                          src={it.image}
-                          alt=""
-                          className="w-12 h-12 object-cover rounded"
-                        />
-                        <div className="flex-1">
-                          <div className="text-sm font-medium">{it.title}</div>
-                          <div className="text-xs text-gray-500">
-                            {it.price} · qty {it.qty}
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => cart.removeItem(it.title)}
-                          className="text-xs text-red-600"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-sm text-gray-500">
-                      Your cart is empty
-                    </div>
+              {/* Cart with Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setCartOpen((s) => !s)}
+                  className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  aria-label="Open cart"
+                >
+                  <ShoppingCart className="w-6 h-6 text-gray-700" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-xs font-bold text-white rounded-full bg-red-500 animate-pulse">
+                      {cartCount}
+                    </span>
                   )}
-                </div>
-                {cart?.items?.length ? (
-                  <div className="mt-4 flex flex-col gap-3">
-                    <div className="flex items-center justify-between">
-                      <button
-                        onClick={() => cart.clearCart()}
-                        className="text-sm text-gray-600"
-                      >
-                        Clear
-                      </button>
-                      <Link
-                        to="/cart"
-                        className="px-3 py-2 bg-gray-100 rounded text-sm"
-                        onClick={() => setCartOpen(false)}
-                      >
-                        View Cart
-                      </Link>
+                </button>
+
+                {/* Cart Dropdown */}
+                {cartOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-30"
+                      onClick={() => setCartOpen(false)}
+                    />
+                    <div className="absolute right-0 mt-4 w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-40 overflow-hidden">
+                      <div className="bg-gradient-to-r from-gray-800 to-gray-900 text-white px-5 py-4">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-semibold text-lg">Your Cart</h4>
+                          <span className="text-sm bg-white/20 px-3 py-1 rounded-full">
+                            {cartCount} {cartCount === 1 ? "item" : "items"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="max-h-80 overflow-auto p-4">
+                        {cart?.items?.length ? (
+                          <div className="space-y-3">
+                            {cart.items.map((it, i) => (
+                              <div
+                                key={i}
+                                className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                              >
+                                <img
+                                  src={it.image}
+                                  alt={it.title}
+                                  className="w-16 h-16 object-cover rounded-lg"
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-sm font-semibold text-gray-900 truncate">
+                                    {it.title}
+                                  </div>
+                                  <div className="text-xs text-gray-600 mt-1">
+                                    {it.price} × {it.qty}
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={() => cart.removeItem(it.title)}
+                                  className="text-xs text-red-600 hover:text-red-700 font-medium px-2 py-1 hover:bg-red-50 rounded transition-colors"
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="py-12 text-center">
+                            <ShoppingCart className="w-12 h-12 mx-auto text-gray-300 mb-3" />
+                            <p className="text-sm text-gray-500">
+                              Your cart is empty
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {cart?.items?.length ? (
+                        <div className="border-t border-gray-200 p-4 bg-gray-50">
+                          <div className="flex items-center justify-between mb-3">
+                            <button
+                              onClick={() => cart.clearCart()}
+                              className="text-sm text-gray-600 hover:text-gray-900 font-medium"
+                            >
+                              Clear All
+                            </button>
+                            <Link
+                              to="/cart"
+                              className="text-sm text-gray-900 font-medium hover:underline"
+                              onClick={() => setCartOpen(false)}
+                            >
+                              View Full Cart
+                            </Link>
+                          </div>
+                          <Link to="/cart" onClick={() => setCartOpen(false)}>
+                            <button className="w-full px-4 py-3 bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all">
+                              Proceed to Checkout
+                            </button>
+                          </Link>
+                        </div>
+                      ) : null}
                     </div>
-                    <Link to="/cart">
-                      <button className="w-full px-4 py-2 bg-gray-900 text-white rounded">
-                        Checkout
-                      </button>
-                    </Link>
-                  </div>
-                ) : null}
+                  </>
+                )}
               </div>
-            )}
-          </div>
-          <Link to="/admin/login">
-            <User width={30} height={30} className="text-[#333333]" />
-          </Link>
-        </div>
 
-        {/* hamburger for mobile */}
-        <button
-          className="md:hidden p-2 rounded-md text-[#2c2c2c]"
-          onClick={() => setOpen(true)}
-          aria-label="Open menu"
-        >
-          <Menu width={28} height={28} />
-        </button>
-      </div>
-
-      {/* transient add-to-cart toast */}
-      {cart?.lastAdded && (
-        <div className="fixed top-20 right-6 z-50">
-          <div className="bg-white border rounded-lg shadow-lg px-4 py-3 flex items-center gap-3">
-            <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center text-gray-700">
-              ✓
+              <Link
+                to="/admin/login"
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <User className="w-6 h-6 text-gray-700" />
+              </Link>
             </div>
-            <div>
-              <div className="text-sm font-semibold">Added to cart</div>
-              <div className="text-xs text-gray-500">{cart.lastAdded}</div>
+
+            {/* Mobile Menu Button */}
+            <button
+              className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              onClick={() => setOpen(true)}
+              aria-label="Open menu"
+            >
+              <Menu className="w-7 h-7 text-gray-700" />
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Add-to-Cart Toast Notification */}
+      {cart?.lastAdded && (
+        <div className="fixed top-24 right-4 md:right-8 z-50 animate-slide-in-right">
+          <div className="bg-white border-2 border-green-500 rounded-xl shadow-2xl px-5 py-4 flex items-center gap-4 min-w-[280px]">
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg
+                className="w-6 h-6 text-green-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <div className="text-sm font-bold text-gray-900">
+                Added to cart!
+              </div>
+              <div className="text-xs text-gray-600 mt-0.5 truncate">
+                {cart.lastAdded}
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Mobile sidebar / dropdown */}
+      {/* Mobile Sidebar */}
       {open && (
-        <div className="fixed inset-0 z-50 flex">
-          {/* overlay (fade in) */}
+        <div className="fixed inset-0 z-50 lg:hidden">
+          {/* Overlay */}
           <div
-            className="absolute inset-0 bg-black/40 animate__animated animate__fadeIn"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
             onClick={() => setOpen(false)}
-            aria-hidden
+            aria-hidden="true"
           />
 
-          {/* sidebar (slide in) */}
-          <aside className="relative w-64 max-w-full h-full bg-[#333333] text-white p-6 animate__animated animate__slideInLeft animate__faster">
-            <button
-              className="absolute top-4 right-4 text-white p-1"
-              onClick={() => setOpen(false)}
-              aria-label="Close menu"
-            >
-              <X width={22} height={22} />
-            </button>
+          {/* Sidebar */}
+          <aside className="absolute left-0 top-0 bottom-0 w-80 max-w-[85vw] bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white shadow-2xl transform transition-transform overflow-y-auto">
+            {/* Header */}
+            <div className="sticky top-0 bg-gradient-to-r from-gray-900 to-gray-800 border-b border-white/10 px-6 py-5 z-10">
+              <button
+                className="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-lg transition-colors"
+                onClick={() => setOpen(false)}
+                aria-label="Close menu"
+              >
+                <X className="w-6 h-6" />
+              </button>
 
-            <div className="mb-6">
-              <div className="flex items-center gap-3">
-                <BookOpen width={28} height={28} className="text-white" />
-                <h2
-                  className="text-[20px] font-bold lib"
-                  style={{ letterSpacing: "3px" }}
-                >
-                  AJAGBE
-                </h2>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
+                  <BookOpen className="w-6 h-6 text-white" />
+                </div>
+                <h2 className="text-xl font-bold tracking-widest">AJAGBE</h2>
               </div>
-              <p className="text-sm text-white/80">AUTHOR & WRITER</p>
+              <p className="text-sm text-white/70 ml-13">AUTHOR & WRITER</p>
             </div>
 
-            <nav>
-              <ul className="flex flex-col gap-4">
-                <li>
-                  <Link
-                    to="/home"
-                    className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
-                    // style={{ animationDelay: `${idx * 100}ms` }}
-                    onClick={() => setOpen(false)}
-                  >
-                    Homes
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/about"
-                    className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
-                    onClick={() => setOpen(false)}
-                  >
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/shop"
-                    className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
-                    onClick={() => setOpen(false)}
-                  >
-                    Shop
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/event"
-                    className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
-                    onClick={() => setOpen(false)}
-                  >
-                    Event
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/Blog"
-                    className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
-                    onClick={() => setOpen(false)}
-                  >
-                    Blog
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/contact"
-                    className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
-                    onClick={() => setOpen(false)}
-                  >
-                    Contact
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/interview"
-                    className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
-                    onClick={() => setOpen(false)}
-                  >
-                    Interview
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/giveaway"
-                    className="text-white font-bold text-[16px] non uppercase"
-                    onClick={() => setOpen(false)}
-                  >
-                    Giveaway
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/signed-book"
-                    className="text-white font-bold text-[16px] non uppercase"
-                    onClick={() => setOpen(false)}
-                  >
-                    Signed Book
-                  </Link>
-                </li>
-                {/* {links.map((label, idx) => (
-                  <li
-                    key={label}
-                    className={`animate__animated animate__fadeInUp`}
-                    style={{ animationDelay: `${idx * 100}ms` }}
-                  >
+            {/* Navigation Links */}
+            <nav className="px-4 py-6">
+              <ul className="space-y-1">
+                {[
+                  { to: "/home", label: "Home" },
+                  { to: "/about", label: "About" },
+                  { to: "/shop", label: "Shop" },
+                  { to: "/event", label: "Event" },
+                  { to: "/blog", label: "Blog" },
+                  { to: "/contact", label: "Contact" },
+                  { to: "/interview", label: "Interview" },
+                  { to: "/giveaway", label: "Giveaway" },
+                  { to: "/signed-book", label: "Signed Book" },
+                ].map((link, idx) => (
+                  <li key={idx}>
                     <Link
-                      to="/home"
-                      className="uppercase font-bold text-white transition-transform duration-200 ease-in-out hover:translate-x-2 hover:text-[#f3f3f3]"
+                      to={link.to}
+                      className="flex items-center gap-3 px-4 py-3 rounded-lg uppercase font-semibold text-sm tracking-wide text-white hover:bg-white/10 transition-all duration-200 group"
+                      onClick={() => setOpen(false)}
                     >
-                      {label}
+                      <span className="w-1.5 h-1.5 rounded-full bg-white/40 group-hover:bg-white group-hover:scale-150 transition-all"></span>
+                      {link.label}
                     </Link>
                   </li>
-                ))} */}
+                ))}
               </ul>
             </nav>
 
-            <div className="mt-8 border-t border-white/20 pt-4">
-              <div
-                className="flex items-center gap-4 animate__animated animate__fadeInUp"
-                style={{ animationDelay: "600ms" }}
-              >
-                <Search width={24} height={24} className="text-white" />
-                <Link to="/cart" onClick={() => setOpen(false)}>
-                  <div className="relative">
-                    <ShoppingCart
-                      width={24}
-                      height={24}
-                      className="text-white"
-                    />
-                    <span className="text-[12px] w-[18px] h-[18px] absolute -top-2 right-[-6px] flex items-center justify-center text-[#fff] rounded-full bg-[#e4573d]">
-                      {cartCount}
-                    </span>
-                  </div>
-                </Link>
-                <User
-                  width={24}
-                  height={24}
-                  className="text-white"
+            {/* Bottom Actions */}
+            <div className="sticky bottom-0 bg-gradient-to-t from-gray-900 via-gray-900 to-transparent border-t border-white/10 px-6 py-5">
+              <div className="flex items-center justify-around">
+                <button
+                  className="flex flex-col items-center gap-2 p-3 hover:bg-white/10 rounded-lg transition-colors"
+                  aria-label="Search"
+                >
+                  <Search className="w-6 h-6" />
+                  <span className="text-xs">Search</span>
+                </button>
+
+                <Link
+                  to="/cart"
                   onClick={() => setOpen(false)}
-                />
+                  className="flex flex-col items-center gap-2 p-3 hover:bg-white/10 rounded-lg transition-colors relative"
+                >
+                  <div className="relative">
+                    <ShoppingCart className="w-6 h-6" />
+                    {cartCount > 0 && (
+                      <span className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center text-xs font-bold text-white rounded-full bg-red-500">
+                        {cartCount}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-xs">Cart</span>
+                </Link>
+
+                <Link
+                  to="/admin/login"
+                  onClick={() => setOpen(false)}
+                  className="flex flex-col items-center gap-2 p-3 hover:bg-white/10 rounded-lg transition-colors"
+                >
+                  <User className="w-6 h-6" />
+                  <span className="text-xs">Account</span>
+                </Link>
               </div>
             </div>
           </aside>
         </div>
       )}
+
+      <style jsx>{`
+        @keyframes slide-in-right {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        .animate-slide-in-right {
+          animation: slide-in-right 0.3s ease-out;
+        }
+      `}</style>
     </>
   );
 };

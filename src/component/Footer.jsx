@@ -92,7 +92,7 @@ const Footer = () => {
             <ul className="space-y-2">
               <li>
                 <a
-                  href="#home"
+                  href="/home"
                   className="text-gray-400 hover:text-white non transition-colors duration-300 text-sm"
                 >
                   Home
@@ -100,7 +100,7 @@ const Footer = () => {
               </li>
               <li>
                 <a
-                  href="#about"
+                  href="/about"
                   className="text-gray-400 hover:text-white  non transition-colors duration-300 text-sm"
                 >
                   About Us
@@ -108,7 +108,7 @@ const Footer = () => {
               </li>
               <li>
                 <a
-                  href="#contact"
+                  href="/contact"
                   className="text-gray-400 hover:text-white non transition-colors duration-300 text-sm"
                 >
                   Contact
@@ -151,24 +151,6 @@ https://www.threads.com/@the_ayodimeji1?igshid=NTc4MTIwNjQ2YQ=="
                 </Link>
               </div>
             </ul>
-          </div>
-
-          {/* We Accept Section */}
-          <div className="footer-section">
-            <h3 className="text-xl font-bold mb-4 non">We Accept</h3>
-            <div className="flex gap-3 items-center">
-              <div className="payment-icon bg-white rounded px-3 py-2">
-                <span className="text-blue-600 font-bold text-lg non">
-                  VISA
-                </span>
-              </div>
-              <div className="payment-icon bg-gradient-to-r from-red-600 to-orange-500 rounded-full w-10 h-10 flex items-center justify-center">
-                <span className="text-white font-bold text-xs non">MC</span>
-              </div>
-              <div className="payment-icon bg-gradient-to-r from-blue-400 to-blue-600 rounded px-3 py-2">
-                <span className="text-white font-bold text-xs non">AMEX</span>
-              </div>
-            </div>
           </div>
         </div>
 

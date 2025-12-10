@@ -364,7 +364,8 @@ export default function WriterPortfolio() {
               </div>
 
               <p className="text-xl lg:text-2xl text-gray-600 leading-relaxed animate-slide-up animation-delay-200 font-light">
-                My books are meant as sweet escapes where the passionate, yet tender love is undeniable.
+                My books are meant as sweet escapes where the passionate, yet
+                tender love is undeniable.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-slide-up animation-delay-400 pt-4">
@@ -412,11 +413,11 @@ export default function WriterPortfolio() {
           <Quote className="w-96 h-96 absolute -bottom-20 -right-20 text-gray-900 rotate-180" />
         </div>
         <div className="container mx-auto px-4 relative z-10">
-          <blockquote className="text-2xl lg:text-3xl text-center text-gray-700 font-light italic max-w-4xl mx-auto">
+          <blockquote className="text-[16px] sm:text-[18px] md:text-[20px] lg:text-[24px] text-center text-gray-700 font-light italic max-w-4xl mx-auto">
             “It’s rare to read anything that feels this unique. A richly
             imagined, ambitious, and suspenseful novel that is striking for its
             deft juxtaposition of small, human moments with larger concerns
-            about decision making.” <br /> — A.H Mohammed, author of The Last
+            about decision making.” — <br /> A.H Mohammed, author of The Last
             Days at Forcados High School BOOKS
           </blockquote>
         </div>
@@ -441,7 +442,7 @@ export default function WriterPortfolio() {
 
           <div className="bg-gradient-to-br from-gray-50 to-stone-50 rounded-3xl p-8 lg:p-12 shadow-xl">
             <div className="prose prose-lg max-w-none space-y-6 text-gray-700 leading-relaxed">
-              <p className="animate-slide-up text-lg">
+              <p className="animate-slide-up text-lg text-center">
                 <strong className="text-gray-900 text-xl">
                   Ayodeji Ajagbe
                 </strong>{" "}
@@ -453,7 +454,7 @@ export default function WriterPortfolio() {
                 creative life.
               </p>
 
-              <p className="animate-slide-up animation-delay-200 text-lg">
+              <p className="animate-slide-up text-center animation-delay-200 text-lg">
                 After receiving encouraging feedback from friends and beta
                 readers, he committed fully to a career as a writer. His debut
                 novel,{" "}
@@ -466,13 +467,13 @@ export default function WriterPortfolio() {
                 Top 10 Romances of the Year.
               </p>
 
-              <p className="animate-slide-up animation-delay-400 text-lg">
+              <p className="animate-slide-up text-center animation-delay-400 text-lg">
                 The novel was also featured as a Louisiana Channel's Red Hot
                 Read, earned bestseller status in Kenya, and was nominated for
                 the Legacy of Literature Award in India.
               </p>
 
-              <p className="animate-slide-up animation-delay-600 text-lg">
+              <p className="animate-slide-up text-center animation-delay-600 text-lg">
                 Ayodeji is the author and curator of{" "}
                 <em className="text-indigo-700 font-semibold">
                   Under the Milky Way
@@ -486,7 +487,7 @@ export default function WriterPortfolio() {
                 African literature and emerging voices.
               </p>
 
-              <p className="animate-slide-up animation-delay-800 text-lg">
+              <p className="animate-slide-up animation-delay-800 text-center text-lg">
                 Alongside writing, Ayodeji works as a literary agent, connecting
                 authors with readers, and amplifying new and established voices
                 within the literary community. His passion for writing extends
@@ -494,7 +495,7 @@ export default function WriterPortfolio() {
                 features and creative collaborations.
               </p>
 
-              <p className="animate-slide-up animation-delay-1000 text-lg">
+              <p className="animate-slide-up animation-delay-1000 text-center text-lg">
                 He lives with his family in Ibadan, Oyo State, where he is
                 currently working on his next book.
               </p>

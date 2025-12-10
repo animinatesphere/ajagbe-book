@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import ch from "../assets/IMG_3702.JPG";
 import medal from "../assets/IMG_7974.WEBP";
 import medal2 from "../assets/IMG_7975.WEBP";
+import me from "../assets/IMG_8145.JPG";
 
 const heroVariants = [
   {
@@ -21,6 +22,14 @@ const heroVariants = [
     medals: [medal],
     heroImage: ch,
     heroAlt: "New release image",
+  },
+  {
+    preTitle: "New release",
+    titleLines: ["Discover the", "latest novel."],
+    buttonText: "Learn more",
+    medals: [medal],
+    heroImage: me,
+    heroAlt: "Ajagbe Ayodeji image",
   },
 ];
 

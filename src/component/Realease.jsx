@@ -61,7 +61,6 @@ const Realease = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollRef = useRef(null);
   const itemsPerPage = 3;
-  
 
   const scrollToPage = (pageIndex) => {
     if (scrollRef.current) {
@@ -101,7 +100,10 @@ const Realease = () => {
   const findSlug = (title) => {
     const s = slugify(title);
     if (booksData[s]) return s;
-    const norm = title.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+    const norm = title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
     for (const k of Object.keys(booksData)) {
       const t = booksData[k].title.toLowerCase();
       if (t.includes(norm) || norm.includes(t)) return k;
@@ -127,7 +129,9 @@ const Realease = () => {
       }
     };
     fetch();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const itemsToRender = dbBooks.length ? dbBooks : books;
@@ -203,7 +207,10 @@ const Realease = () => {
                 className="book-card w-[232px] min-w-[232px] relative bg-[#EEF2FF] rounded-lg shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden"
               >
                 <div className="relative overflow-hidden">
-                  <Link to={`/book/${item.slug || findSlug(item.title)}`} className="block">
+                  <Link
+                    to={`/book/${item.slug || findSlug(item.title)}`}
+                    className="block"
+                  >
                     <img
                       src={item.image_url || item.image}
                       alt=""
@@ -211,7 +218,7 @@ const Realease = () => {
                     />
                   </Link>
                   <span className="absolute text-[16px] text-[#4F46E5] non font-bold bg-[#EEF2FF] top-4 left-4 text-center px-3 py-1 rounded-full shadow-md">
-                    {item.price || item.prize}
+                    {`₦${item.price || item.prize}`}
                   </span>
                 </div>
                 <div className="px-4 pb-4">
@@ -220,7 +227,11 @@ const Realease = () => {
                   </p>
                   <button
                     onClick={() =>
-                      addItem({ title: item.title, price: item.price || item.prize, image: item.image_url || item.image })
+                      addItem({
+                        title: item.title,
+                        price: item.price || item.prize,
+                        image: item.image_url || item.image,
+                      })
                     }
                     className="flex items-center justify-center bg-[#18181B] text-[#FFFFFF] gap-2 w-full h-[32px] mt-3 rounded-md hover:bg-[#4F46E5] transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md"
                   >
@@ -234,21 +245,24 @@ const Realease = () => {
 
         {/* Pagination Dots */}
         {(() => {
-          const totalPages = Math.max(1, Math.ceil(itemsToRender.length / itemsPerPage));
+          const totalPages = Math.max(
+            1,
+            Math.ceil(itemsToRender.length / itemsPerPage)
+          );
           return (
             <div className="flex justify-center items-center gap-3 mt-6">
               {Array.from({ length: totalPages }).map((_, index) => (
-            <button
-              key={index}
-              onClick={() => scrollToPage(index)}
-              className={`dot w-3 h-3 rounded-full transition-all duration-300 ${
-                currentIndex === index
-                  ? "bg-[#4F46E5] active"
-                  : "bg-gray-300 hover:bg-gray-400"
-              }`}
-              aria-label={`Go to page ${index + 1}`}
-            />
-          ))}
+                <button
+                  key={index}
+                  onClick={() => scrollToPage(index)}
+                  className={`dot w-3 h-3 rounded-full transition-all duration-300 ${
+                    currentIndex === index
+                      ? "bg-[#4F46E5] active"
+                      : "bg-gray-300 hover:bg-gray-400"
+                  }`}
+                  aria-label={`Go to page ${index + 1}`}
+                />
+              ))}
             </div>
           );
         })()}
