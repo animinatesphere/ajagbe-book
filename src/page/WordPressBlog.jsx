@@ -1,16 +1,15 @@
+// WordPressBlog.jsx - Main component
 import React, { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
+import BlogDetailPage from "./BlogDetailPage";
 import {
   Search,
   Calendar,
-  User,
   ChevronRight,
   Loader2,
-  X,
   Clock,
   ArrowRight,
   Sparkles,
-  Tag,
 } from "lucide-react";
 
 export default function WordPressBlog() {
@@ -61,11 +60,21 @@ export default function WordPressBlog() {
     return `${minutes} min read`;
   };
 
+  // ⭐ KEY CHANGE: If a post is selected, show the detail page instead of the list
+  if (selectedPost) {
+    return (
+      <BlogDetailPage
+        postId={selectedPost.id}
+        onBack={() => setSelectedPost(null)}
+      />
+    );
+  }
+
   const featuredPost = filteredPosts[0];
   const regularPosts = filteredPosts.slice(1);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br  pt-35 from-gray-50 via-white to-gray-50">
+    <div className="min-h-screen bg-gradient-to-br pt-35 from-gray-50 via-white to-gray-50">
       {/* Hero Header with Animated Background */}
       <header className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-700 to-pink-600 text-white">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00em0wLTEwYzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHpNMTIgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00em0wLTEwYzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-10"></div>
@@ -299,111 +308,6 @@ export default function WordPressBlog() {
           </>
         )}
       </main>
-
-      {/* Enhanced Modal for Full Post */}
-      {selectedPost && (
-        <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn"
-          onClick={() => setSelectedPost(null)}
-        >
-          <div
-            className="bg-white rounded-3xl max-w-5xl max-h-[90vh] overflow-y-auto shadow-2xl animate-slideUp"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="relative h-80 md:h-[28rem] overflow-hidden">
-              <img
-                src={
-                  selectedPost.featured_image ||
-                  "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800"
-                }
-                alt={selectedPost.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-
-              <button
-                onClick={() => setSelectedPost(null)}
-                className="absolute top-6 right-6 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-xl hover:bg-white transition-all hover:scale-110"
-              >
-                <X size={24} className="text-gray-800" />
-              </button>
-
-              <div className="absolute bottom-8 left-8 right-8">
-                <div className="flex items-center space-x-3 mb-4 text-white/90 text-sm">
-                  <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                    <Calendar size={14} />
-                    <span>{formatDate(selectedPost.created_at)}</span>
-                  </div>
-                  <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                    <Clock size={14} />
-                    <span>{getReadTime(selectedPost.content)}</span>
-                  </div>
-                </div>
-                <h1 className="text-4xl md:text-5xl font-extrabold text-white leading-tight drop-shadow-lg">
-                  {selectedPost.title}
-                </h1>
-              </div>
-            </div>
-
-            <div className="p-8 md:p-12">
-              <div className="flex items-center space-x-4 pb-8 mb-8 border-b border-gray-200">
-                <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-2xl shadow-lg">
-                  {(selectedPost.author || "A")[0].toUpperCase()}
-                </div>
-                <div>
-                  <p className="font-bold text-gray-900 text-lg">
-                    {selectedPost.author || "Anonymous"}
-                  </p>
-                  <p className="text-gray-500">Article Author</p>
-                </div>
-              </div>
-
-              <div className="prose prose-lg max-w-none">
-                <div className="text-gray-700 leading-relaxed text-lg whitespace-pre-wrap">
-                  {selectedPost.content}
-                </div>
-              </div>
-
-              <div className="mt-12 pt-8 border-t border-gray-200">
-                <button
-                  onClick={() => setSelectedPost(null)}
-                  className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all hover:scale-105"
-                >
-                  Close Article
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-        @keyframes slideUp {
-          from {
-            transform: translateY(20px);
-            opacity: 0;
-          }
-          to {
-            transform: translateY(0);
-            opacity: 1;
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
-        }
-        .animate-slideUp {
-          animation: slideUp 0.4s ease-out;
-        }
-      `}</style>
     </div>
   );
 }

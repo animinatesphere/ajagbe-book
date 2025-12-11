@@ -5,6 +5,7 @@ import ven from "../assets/IMG_7971.JPG";
 import helen from "../assets/IMG_7972.JPG";
 import ref from "../assets/IMG_7973.JPG";
 import un from "../assets/IMG_2884.JPG";
+import { Link } from "react-router-dom";
 const Favourite = () => {
   const bookCovers = [
     {
@@ -139,17 +140,19 @@ const Favourite = () => {
             </div>
 
             <p className="text-gray-600 leading-relaxed max-w-lg">
-              Discover your next great read from our curated collection of
-              bestsellers, classics, and hidden gems. Whether you're into
-              thrilling mysteries, heartfelt romances, or inspiring non-fiction,
-              we have something special waiting for you.
+              Discover your next great read from Ayodeji Ajagbe curated
+              collection of bestsellers, classics, and hidden gems. Whether
+              you're into mysteries, romances, or peotry non-fiction,Ayodeji has
+              something special waiting for you.
             </p>
 
             {/* CTA Button */}
             <div className="pt-2">
-              <button className="bg-indigo-600 text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:bg-indigo-700 hover:shadow-xl transform hover:scale-105 active:scale-95 transition-all duration-300">
-                About Us
-              </button>
+              <Link to="/shop">
+                <button className="bg-indigo-600 text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:bg-indigo-700 hover:shadow-xl transform hover:scale-105 active:scale-95 transition-all duration-300">
+                  Shop now
+                </button>
+              </Link>
             </div>
           </div>
         </div>

@@ -20,9 +20,7 @@ import me2 from "../assets/IMG_0240.JPG";
 import me6 from "../assets/IMG_8144.JPG";
 import me7 from "../assets/IMG_8143.JPG";
 import me8 from "../assets/IMG_0396.JPG";
-import v1 from "../assets/VID-20251206-WA0125.mp4";
-import v2 from "../assets/VID-20251206-WA0126.mp4";
-import v3 from "../assets/VID-20251207-WA0027.mp4";
+
 import Footer from "../component/Footer";
 export default function WriterPortfolio() {
   const [, setScrolled] = useState(false);
@@ -153,10 +151,6 @@ export default function WriterPortfolio() {
     { id: 7, caption: "with fellow friend", pic: me6 },
     { id: 7, caption: "with fellow friends", pic: me7 },
     { id: 2, caption: "With Fellow Authors", pic: me8 },
-    // video items (click to play)
-    { id: 11, caption: "Event clip 1", video: v1 },
-    { id: 12, caption: "Event clip 2", video: v2 },
-    { id: 13, caption: "Event clip 3", video: v3 },
   ];
 
   return (
@@ -417,9 +411,14 @@ export default function WriterPortfolio() {
             “It’s rare to read anything that feels this unique. A richly
             imagined, ambitious, and suspenseful novel that is striking for its
             deft juxtaposition of small, human moments with larger concerns
-            about decision making.” — <br /> A.H Mohammed, author of The Last
-            Days at Forcados High School BOOKS
+            about decision making.”
           </blockquote>
+
+          <p className="text-[16px] sm:text-[18px] md:text-[20px] lg:text-[24px] text-center text-gray-700 font-light italic max-w-4xl mx-auto">
+            {" "}
+            — A.H Mohammed, author of The Last Days at Forcados High School
+            BOOKS
+          </p>
         </div>
       </section>
 

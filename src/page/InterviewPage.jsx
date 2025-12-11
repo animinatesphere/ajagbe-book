@@ -196,22 +196,21 @@ const InterviewPage = () => {
           <div className="relative max-w-7xl mx-auto px-6 py-24 sm:py-32">
             <div className="text-center space-y-8">
               <div className="inline-flex items-center gap-2 px-5 py-2 bg-white rounded-full border border-gray-200 shadow-sm">
-                <Sparkles className="w-4 h-4 text-indigo-600" />
                 <span className="text-sm font-semibold text-gray-700">
                   Award-Winning Author
                 </span>
               </div>
 
-              <h1 className="text-5xl sm:text-7xl font-bold tracking-tight text-gray-900">
+              <h1 className="text-[24px] sm:text-[26px] md:text-[30px] lg:text-[50px] font-bold tracking-tight text-gray-900">
                 Interviews & <span className="text-indigo-600">Features</span>
               </h1>
 
-              <p className="text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] text-gray-600 max-w-3xl mx-auto leading-relaxed">
                 Conversations on literature, creativity, and the craft of
                 storytelling with Ayodeji Ajagbe
               </p>
 
-              <div className="flex items-center justify-center gap-12 pt-8">
+              <div className="flex items-center justify-center gap-8 pt-8">
                 <div className="text-center">
                   <div className="text-[14px] sm:text-[16px] md:text-[24px] lg:text-[28px] font-bold text-gray-900">
                     {interviews.length}+
@@ -253,7 +252,7 @@ const InterviewPage = () => {
                   Featured
                 </span>
               </div>
-              <h2 className="text-4xl sm:text-5xl font-bold text-gray-900">
+              <h2 className="text-[16px] sm:text-[18px] md:text-[20px] lg:text-[24px]  font-bold text-gray-900">
                 Highlighted Conversations
               </h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -286,7 +285,7 @@ const InterviewPage = () => {
                       interview.type.slice(1)}
                   </div>
 
-                  <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors leading-tight">
+                  <h3 className="text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] font-bold text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors leading-tight">
                     {interview.title}
                   </h3>
 

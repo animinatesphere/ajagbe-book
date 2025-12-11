@@ -331,12 +331,13 @@ export const Navbar = () => {
                   </div>
                   <span className="text-xs">Cart</span>
                 </Link>
-                <User
-                  width={24}
-                  height={24}
-                  className="text-white"
+                <Link
+                  to="/admin/login"
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                   onClick={() => setOpen(false)}
-                />
+                >
+                  <User className="w-6 h-6 text-gray-700" />
+                </Link>
               </div>
             </div>
           </aside>
