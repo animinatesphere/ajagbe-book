@@ -140,10 +140,7 @@ const Favourite = () => {
             </div>
 
             <p className="text-gray-600 leading-relaxed max-w-lg">
-              Discover your next great read from Ayodeji Ajagbe curated
-              collection of bestsellers, classics, and hidden gems. Whether
-              you're into mysteries, romances, or peotry non-fiction,Ayodeji has
-              something special waiting for you.
+              Discover your next great read from Ayodeji Ajagbe’s curated collection of bestsellers, classics, and hidden gems. Whether you're into mysteries, romances, or poetry, Ayodeji has something special waiting for you.
             </p>
 
             {/* CTA Button */}
