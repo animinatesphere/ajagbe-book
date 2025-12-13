@@ -25,6 +25,7 @@ export default function BlogDetailPage({ postId, onBack }) {
   const [relatedPosts, setRelatedPosts] = useState([]);
   const [showShareModal, setShowShareModal] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
 
   // ⭐ Use useCallback to memoize the functions
   const fetchPost = useCallback(async () => {
@@ -84,15 +85,21 @@ export default function BlogDetailPage({ postId, onBack }) {
     return `${minutes} min read`;
   };
 
-  // ⭐ Share functionality
-  const shareUrl = window.location.href;
+  // ⭐ Share functionality - PUT THIS HERE (around line 80 in your original file)
+  // Generate a proper share URL with the post ID
+  const baseUrl = window.location.origin + window.location.pathname;
+  const shareUrl = `${baseUrl}?post=${postId}`;
   const shareTitle = post?.title || "Check out this article";
   const shareText = post?.excerpt || "Read this amazing article";
 
   const handleShare = async () => {
+    // Prevent multiple simultaneous share attempts
+    if (isSharing) return;
+
     // Try native Web Share API first (mobile devices)
     if (navigator.share) {
       try {
+        setIsSharing(true);
         await navigator.share({
           title: shareTitle,
           text: shareText,
@@ -103,6 +110,9 @@ export default function BlogDetailPage({ postId, onBack }) {
           console.error("Error sharing:", error);
           setShowShareModal(true);
         }
+      } finally {
+        // Reset the sharing flag after a delay
+        setTimeout(() => setIsSharing(false), 1000);
       }
     } else {
       // Fallback to custom share modal
@@ -181,7 +191,8 @@ export default function BlogDetailPage({ postId, onBack }) {
             <div className="flex items-center space-x-4">
               <button
                 onClick={handleShare}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                disabled={isSharing}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Share this article"
               >
                 <Share2 className="w-5 h-5 text-gray-600" />
@@ -291,7 +302,8 @@ export default function BlogDetailPage({ postId, onBack }) {
                 </span>
                 <button
                   onClick={handleShare}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  disabled={isSharing}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Share2 className="w-5 h-5 text-gray-600" />
                 </button>

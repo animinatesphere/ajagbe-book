@@ -20,6 +20,16 @@ export default function WordPressBlog() {
 
   useEffect(() => {
     fetchPosts();
+
+    // Check if there's a post ID in the URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const postIdFromUrl = urlParams.get("post");
+
+    if (postIdFromUrl) {
+      // Find the post with this ID and set it as selected
+      // We'll do this after posts are loaded
+      setSelectedPost({ id: postIdFromUrl });
+    }
   }, []);
 
   const fetchPosts = async () => {
@@ -60,12 +70,23 @@ export default function WordPressBlog() {
     return `${minutes} min read`;
   };
 
+  // Helper function to handle post selection with URL update
+  const handlePostClick = (post) => {
+    setSelectedPost(post);
+    // Update URL with post ID
+    window.history.pushState({}, "", `?post=${post.id}`);
+  };
+
   // ⭐ KEY CHANGE: If a post is selected, show the detail page instead of the list
   if (selectedPost) {
     return (
       <BlogDetailPage
         postId={selectedPost.id}
-        onBack={() => setSelectedPost(null)}
+        onBack={() => {
+          setSelectedPost(null);
+          // Clear the URL parameter when going back
+          window.history.pushState({}, "", window.location.pathname);
+        }}
       />
     );
   }
@@ -162,7 +183,7 @@ export default function WordPressBlog() {
                 </div>
 
                 <article
-                  onClick={() => setSelectedPost(featuredPost)}
+                  onClick={() => handlePostClick(featuredPost)}
                   className="group relative bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer"
                 >
                   <div className="grid md:grid-cols-2 gap-0">
@@ -250,7 +271,7 @@ export default function WordPressBlog() {
                       <article
                         key={post.id}
                         className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 cursor-pointer border border-gray-100"
-                        onClick={() => setSelectedPost(post)}
+                        onClick={() => handlePostClick(post)}
                         style={{ animationDelay: `${index * 100}ms` }}
                       >
                         <div className="relative h-56 overflow-hidden">

@@ -42,6 +42,7 @@ export default function AdminDashboard() {
   const [search, setSearch] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [activeTab, setActiveTab] = useState("books");
+  const [editingBook, setEditingBook] = useState(null);
   // Blog state
   const [blogPosts, setBlogPosts] = useState([]);
   const [blogLoading, setBlogLoading] = useState(false);
@@ -82,6 +83,28 @@ export default function AdminDashboard() {
     fetchSignedBooksInfo();
     fetchBlogPosts();
   }, []);
+  const deleteBook = async (slug) => {
+    if (
+      !confirm(
+        "Are you sure you want to delete this book? This action cannot be undone."
+      )
+    )
+      return;
+    try {
+      const { error } = await supabase.from("books").delete().eq("slug", slug);
+      if (error) throw error;
+      toast.show("Book deleted successfully!", { type: "success" });
+      fetchBooks();
+      if (editingBook?.slug === slug) {
+        setEditingBook(null);
+        setForm({ title: "", slug: "", price: "", description: "" });
+        setFile(null);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.show("Failed to delete book.", { type: "error" });
+    }
+  };
   const saveBlogPost = async (e) => {
     e.preventDefault();
     const { show } = toast;
@@ -183,11 +206,38 @@ export default function AdminDashboard() {
         .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      setOrders(data || []);
+
+      // Remove duplicates based on ID (just in case)
+      const uniqueOrders = data
+        ? Array.from(new Map(data.map((order) => [order.id, order])).values())
+        : [];
+
+      setOrders(uniqueOrders);
     } catch (e) {
       console.debug(e);
     } finally {
       setOrdersLoading(false);
+    }
+  };
+
+  const deleteOrder = async (id) => {
+    if (
+      !confirm(
+        "Are you sure you want to delete this order? This action cannot be undone."
+      )
+    )
+      return;
+    try {
+      const { error } = await supabase.from("orders").delete().eq("id", id);
+      if (error) throw error;
+      toast.show("Order deleted successfully!", { type: "success" });
+      fetchOrders();
+      if (selectedOrder?.id === id) {
+        setSelectedOrder(null);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.show("Failed to delete order.", { type: "error" });
     }
   };
 
@@ -232,7 +282,7 @@ export default function AdminDashboard() {
     }
     setLoading(true);
     try {
-      let image_url = null;
+      let image_url = editingBook?.image_url || null;
 
       if (file) {
         try {
@@ -243,9 +293,12 @@ export default function AdminDashboard() {
 
           if (upErr) {
             console.warn("Image upload failed:", upErr);
-            show("Image upload failed, but book will be saved without image", {
-              type: "warning",
-            });
+            show(
+              "Image upload failed, but book will be saved without new image",
+              {
+                type: "warning",
+              }
+            );
           } else {
             const { data: publicUrlData } = supabase.storage
               .from("book-images")
@@ -254,9 +307,12 @@ export default function AdminDashboard() {
           }
         } catch (uploadError) {
           console.warn("Image upload error:", uploadError);
-          show("Image upload failed, but book will be saved without image", {
-            type: "warning",
-          });
+          show(
+            "Image upload failed, but book will be saved without new image",
+            {
+              type: "warning",
+            }
+          );
         }
       }
 
@@ -268,16 +324,28 @@ export default function AdminDashboard() {
         image_url,
       };
 
-      const { error } = await supabase.from("books").upsert(payload);
-      if (error) throw error;
+      if (editingBook) {
+        // Update existing book
+        const { error } = await supabase
+          .from("books")
+          .update(payload)
+          .eq("slug", editingBook.slug);
+        if (error) throw error;
+        show("Book updated successfully!", { type: "success" });
+      } else {
+        // Create new book
+        const { error } = await supabase.from("books").insert([payload]);
+        if (error) throw error;
+        show("Book saved successfully!", { type: "success" });
+      }
 
-      show("Book saved successfully!", { type: "success" });
       setForm({ title: "", slug: "", price: "", description: "" });
       setFile(null);
+      setEditingBook(null);
       fetchBooks();
     } catch (err) {
       console.error(err);
-      toast.show("Failed to create book. Check console.", { type: "error" });
+      toast.show("Failed to save book. Check console.", { type: "error" });
     } finally {
       setLoading(false);
     }
@@ -518,6 +586,14 @@ export default function AdminDashboard() {
                 <Plus className="w-5 h-5 mr-2" />
                 Add New Book
               </h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                {editingBook ? (
+                  <Edit2 className="w-5 h-5 mr-2" />
+                ) : (
+                  <Plus className="w-5 h-5 mr-2" />
+                )}
+                {editingBook ? "Edit Book" : "Add New Book"}
+              </h2>
               <form onSubmit={uploadAndCreate} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -600,19 +676,13 @@ export default function AdminDashboard() {
             </div>
 
             {/* Books List */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Your Books
-              </h3>
-              {loading && (
-                <div className="text-sm text-gray-500">Loading...</div>
-              )}
-              <div className="space-y-3 max-h-[600px] overflow-y-auto">
-                {books.map((b) => (
-                  <div
-                    key={b.slug || b.id}
-                    className="flex items-center gap-3 border border-gray-200 p-3 rounded-lg hover:border-indigo-300 hover:shadow-md transition-all"
-                  >
+            <div className="space-y-3 max-h-[600px] overflow-y-auto">
+              {books.map((b) => (
+                <div
+                  key={b.slug || b.id}
+                  className="border border-gray-200 p-3 rounded-lg hover:border-indigo-300 hover:shadow-md transition-all"
+                >
+                  <div className="flex items-start gap-3 mb-3">
                     <img
                       src={
                         b.image_url ||
@@ -634,14 +704,41 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                   </div>
-                ))}
-                {books.length === 0 && !loading && (
-                  <div className="text-center py-8 text-gray-500">
-                    <Package className="w-12 h-12 mx-auto mb-2 text-gray-400" />
-                    <p className="text-sm">No books yet</p>
+
+                  {/* Edit and Delete Buttons */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setEditingBook(b);
+                        setForm({
+                          title: b.title || "",
+                          slug: b.slug || "",
+                          price: b.price || "",
+                          description: b.description || "",
+                        });
+                        setFile(null);
+                      }}
+                      className="flex-1 px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors flex items-center justify-center gap-1"
+                    >
+                      <Edit2 className="w-3 h-3" />
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => deleteBook(b.slug)}
+                      className="flex-1 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center gap-1"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      Delete
+                    </button>
                   </div>
-                )}
-              </div>
+                </div>
+              ))}
+              {books.length === 0 && !loading && (
+                <div className="text-center py-8 text-gray-500">
+                  <Package className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                  <p className="text-sm">No books yet</p>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -1297,7 +1394,6 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </div>
-
               <div>
                 <h4 className="text-sm font-medium text-gray-500 mb-3">
                   Order Details
@@ -1327,7 +1423,6 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </div>
-
               <div>
                 <h4 className="text-sm font-medium text-gray-500 mb-3">
                   Items
@@ -1338,7 +1433,6 @@ export default function AdminDashboard() {
                     : JSON.stringify(selectedOrder.items, null, 2)}
                 </div>
               </div>
-
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={async () => {
@@ -1375,6 +1469,17 @@ export default function AdminDashboard() {
                   className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
                 >
                   Mark Sent
+                </button>
+                {/* NEW DELETE BUTTON */}
+                <button
+                  onClick={() => {
+                    if (confirm("Delete this order?")) {
+                      deleteOrder(selectedOrder.id);
+                    }
+                  }}
+                  className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </div>
