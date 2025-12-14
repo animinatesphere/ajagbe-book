@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="#4F46E5"/>
+  
+  <!-- Book Shape -->
+  <g transform="translate(100, 100)">
+    <!-- Left page -->
+    <path d="M -35 -40 L -35 40 L 0 35 L 0 -35 Z" fill="#FFFFFF" opacity="0.95"/>
+    
+    <!-- Right page -->
+    <path d="M 0 -35 L 0 35 L 35 40 L 35 -40 Z" fill="#E0E7FF"/>
+    
+    <!-- Spine -->
+    <rect x="-2" y="-35" width="4" height="70" fill="#C7D2FE"/>
+    
+    <!-- Page lines on left -->
+    <line x1="-28" y1="-20" x2="-7" y2="-20" stroke="#4F46E5" stroke-width="1.5" opacity="0.3"/>
+    <line x1="-28" y1="-10" x2="-7" y2="-10" stroke="#4F46E5" stroke-width="1.5" opacity="0.3"/>
+    <line x1="-28" y1="0" x2="-7" y2="0" stroke="#4F46E5" stroke-width="1.5" opacity="0.3"/>
+    <line x1="-28" y1="10" x2="-7" y2="10" stroke="#4F46E5" stroke-width="1.5" opacity="0.3"/>
+    
+    <!-- Letter A on right page -->
+    <text x="17.5" y="10" font-family="Arial, sans-serif" font-size="35" font-weight="bold" fill="#4F46E5" text-anchor="middle">A</text>
+  </g>
+  
+  <!-- Subtle shadow effect -->
+  <ellipse cx="100" cy="195" rx="60" ry="8" fill="#000000" opacity="0.1"/>
+</svg>

@@ -194,13 +194,6 @@ export const Navbar = () => {
                   </>
                 )}
               </div>
-
-              <Link
-                to="/admin/login"
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <User className="w-6 h-6 text-gray-700" />
-              </Link>
             </div>
 
             {/* Mobile Menu Button */}
@@ -330,13 +323,6 @@ export const Navbar = () => {
                     )}
                   </div>
                   <span className="text-xs">Cart</span>
-                </Link>
-                <Link
-                  to="/admin/login"
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                  onClick={() => setOpen(false)}
-                >
-                  <User className="w-6 h-6 text-gray-700" />
                 </Link>
               </div>
             </div>
