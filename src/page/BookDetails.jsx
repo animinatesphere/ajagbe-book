@@ -54,6 +54,56 @@ export default function BookDetails() {
     };
   }, [slug]);
 
+  // Update meta tags when book data changes (NO HELMET NEEDED!)
+  useEffect(() => {
+    if (displayBook) {
+      const bookTitle = displayBook.title;
+      const bookDescription =
+        displayBook.description ||
+        displayBook.dis ||
+        "A captivating read that will keep you engaged from start to finish.";
+      const bookImage = displayBook.image_url || displayBook.image;
+      const bookUrl = `https://ajagbeayodeji.com/book/${slug}`;
+
+      // Update document title
+      document.title = `${bookTitle} | More Than Just Writing`;
+
+      // Helper function to update or create meta tag
+      const updateMetaTag = (property, content, isName = false) => {
+        const attribute = isName ? "name" : "property";
+        let tag = document.querySelector(`meta[${attribute}="${property}"]`);
+
+        if (!tag) {
+          tag = document.createElement("meta");
+          tag.setAttribute(attribute, property);
+          document.head.appendChild(tag);
+        }
+        tag.setAttribute("content", content);
+      };
+
+      // Update Open Graph tags
+      updateMetaTag("og:title", bookTitle);
+      updateMetaTag("og:description", bookDescription);
+      updateMetaTag("og:image", bookImage);
+      updateMetaTag("og:url", bookUrl);
+      updateMetaTag("og:type", "book");
+
+      // Update Twitter tags
+      updateMetaTag("twitter:title", bookTitle, true);
+      updateMetaTag("twitter:description", bookDescription, true);
+      updateMetaTag("twitter:image", bookImage, true);
+      updateMetaTag("twitter:card", "summary_large_image", true);
+
+      // Update description meta tag
+      updateMetaTag("description", bookDescription, true);
+    }
+
+    // Cleanup: Reset to default when component unmounts
+    return () => {
+      document.title = "More Than Just Writing";
+    };
+  }, [displayBook, slug]);
+
   const handleAddToCart = () => {
     if (displayBook) {
       addItem({
