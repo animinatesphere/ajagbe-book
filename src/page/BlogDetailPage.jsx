@@ -1,6 +1,6 @@
 // BlogDetailPage.jsx - Enhanced Detail page with Open Graph meta tags
 import React, { useState, useEffect, useCallback } from "react";
-import { Helmet } from "react-helmet";
+// import { Helmet } from "react-helmet";
 import {
   ArrowLeft,
   Calendar,
@@ -245,30 +245,29 @@ export default function BlogDetailPage({ postId = "1", onBack = () => {} }) {
   return (
     <>
       {/* Open Graph Meta Tags for Social Media Preview */}
-      <Helmet>
-        <title>{post.title}</title>
-        <meta name="description" content={post.excerpt} />
 
-        {/* Open Graph / Facebook */}
-        <meta property="og:type" content="article" />
-        <meta property="og:url" content={shareUrl} />
-        <meta property="og:title" content={post.title} />
-        <meta property="og:description" content={post.excerpt} />
-        <meta property="og:image" content={shareImage} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
+      <title>{post.title}</title>
+      <meta name="description" content={post.excerpt} />
 
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:url" content={shareUrl} />
-        <meta name="twitter:title" content={post.title} />
-        <meta name="twitter:description" content={post.excerpt} />
-        <meta name="twitter:image" content={shareImage} />
+      {/* Open Graph / Facebook */}
+      <meta property="og:type" content="article" />
+      <meta property="og:url" content={shareUrl} />
+      <meta property="og:title" content={post.title} />
+      <meta property="og:description" content={post.excerpt} />
+      <meta property="og:image" content={shareImage} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
 
-        {/* Article specific */}
-        <meta property="article:author" content={post.author} />
-        <meta property="article:published_time" content={post.created_at} />
-      </Helmet>
+      {/* Twitter Card */}
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:url" content={shareUrl} />
+      <meta name="twitter:title" content={post.title} />
+      <meta name="twitter:description" content={post.excerpt} />
+      <meta name="twitter:image" content={shareImage} />
+
+      {/* Article specific */}
+      <meta property="article:author" content={post.author} />
+      <meta property="article:published_time" content={post.created_at} />
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
         {/* Navigation Bar - Improved responsive design */}
