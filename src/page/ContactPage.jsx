@@ -6,6 +6,7 @@ import {
   Mail,
   Phone,
   MessageSquare,
+  AlertCircle,
 } from "lucide-react";
 
 export default function ContactPage() {
@@ -19,6 +20,7 @@ export default function ContactPage() {
   });
 
   const [showNotification, setShowNotification] = useState(false);
+  const [notificationType, setNotificationType] = useState("success"); // 'success' or 'error'
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Captcha state
@@ -34,10 +36,9 @@ export default function ContactPage() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check captcha
     if (parseInt(captchaAnswer) !== captchaNum1 + captchaNum2) {
       setCaptchaError(true);
       return;
@@ -46,25 +47,40 @@ export default function ContactPage() {
     setCaptchaError(false);
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setShowNotification(true);
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        subject: "",
-        message: "",
+    const formDataToSend = new FormData();
+    formDataToSend.append("access_key", "7ad34e05-087f-49d6-b593-0a57134ddf96");
+    formDataToSend.append("name", `${formData.firstName} ${formData.lastName}`);
+    formDataToSend.append("email", formData.email);
+    formDataToSend.append("phone", formData.phone);
+    formDataToSend.append("subject", formData.subject);
+    formDataToSend.append("message", formData.message);
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formDataToSend,
       });
-      setCaptchaAnswer("");
 
-      setTimeout(() => {
-        setShowNotification(false);
-      }, 4000);
-    }, 1500);
+      if (response.ok) {
+        setShowNotification(true);
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: "",
+        });
+        setCaptchaAnswer("");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Failed to send. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+      setTimeout(() => setShowNotification(false), 4000);
+    }
   };
-
   return (
     <>
       <div className="min-h-screen pt-30 lg:pt-34 bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
@@ -76,16 +92,36 @@ export default function ContactPage() {
               : "translate-x-full opacity-0"
           }`}
         >
-          <div className="bg-white rounded-2xl shadow-2xl p-6 flex items-center space-x-4 border border-green-100">
+          <div
+            className={`bg-white rounded-2xl shadow-2xl p-6 flex items-center space-x-4 border ${
+              notificationType === "success"
+                ? "border-green-100"
+                : "border-red-100"
+            }`}
+          >
             <div className="flex-shrink-0">
-              <CheckCircle className="w-8 h-8 text-green-500 animate-bounce" />
+              {notificationType === "success" ? (
+                <CheckCircle className="w-8 h-8 text-green-500 animate-bounce" />
+              ) : (
+                <AlertCircle className="w-8 h-8 text-red-500 animate-bounce" />
+              )}
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-800">
-                Message Sent!
+              <h3
+                className={`text-lg font-semibold ${
+                  notificationType === "success"
+                    ? "text-gray-800"
+                    : "text-red-800"
+                }`}
+              >
+                {notificationType === "success"
+                  ? "Message Sent!"
+                  : "Failed to Send"}
               </h3>
               <p className="text-sm text-gray-600">
-                We'll get back to you soon.
+                {notificationType === "success"
+                  ? "We'll get back to you soon."
+                  : "Please try again later."}
               </p>
             </div>
           </div>
