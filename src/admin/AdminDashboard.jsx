@@ -2,7 +2,29 @@ import React, { useEffect, useState, useMemo } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../context/useToast";
+
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+import Link from "@tiptap/extension-link";
+import Image from "@tiptap/extension-image";
+import Youtube from "@tiptap/extension-youtube";
+import { TextStyle } from "@tiptap/extension-text-style";
+import { Color } from "@tiptap/extension-color"; // Change this line - use named import
+
 import {
+  Bold,
+  Italic,
+  Underline as UnderlineIcon,
+  List,
+  ListOrdered,
+  Link as LinkIcon,
+  Image as ImageIcon,
+  Code,
+  Heading1,
+  Heading2,
+  Undo,
+  Redo,
   BookOpen,
   Bell,
   Truck,
@@ -20,10 +42,126 @@ import {
   Edit2,
   Trash2,
 } from "lucide-react";
-
 function requireAdmin() {
   return localStorage.getItem("isAdmin") === "true";
 }
+const MenuBar = ({ editor }) => {
+  if (!editor) return null;
+
+  return (
+    <div className="border border-gray-300 rounded-t-lg bg-gray-50 p-2 flex flex-wrap gap-1">
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        className={`p-2 rounded hover:bg-gray-200 ${
+          editor.isActive("bold") ? "bg-gray-300" : ""
+        }`}
+      >
+        <Bold className="w-4 h-4" />
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        className={`p-2 rounded hover:bg-gray-200 ${
+          editor.isActive("italic") ? "bg-gray-300" : ""
+        }`}
+      >
+        <Italic className="w-4 h-4" />
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleUnderline().run()}
+        className={`p-2 rounded hover:bg-gray-200 ${
+          editor.isActive("underline") ? "bg-gray-300" : ""
+        }`}
+      >
+        <UnderlineIcon className="w-4 h-4" />
+      </button>
+      <div className="w-px bg-gray-300 mx-1"></div>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+        className={`p-2 rounded hover:bg-gray-200 ${
+          editor.isActive("heading", { level: 1 }) ? "bg-gray-300" : ""
+        }`}
+      >
+        <Heading1 className="w-4 h-4" />
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+        className={`p-2 rounded hover:bg-gray-200 ${
+          editor.isActive("heading", { level: 2 }) ? "bg-gray-300" : ""
+        }`}
+      >
+        <Heading2 className="w-4 h-4" />
+      </button>
+      <div className="w-px bg-gray-300 mx-1"></div>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        className={`p-2 rounded hover:bg-gray-200 ${
+          editor.isActive("bulletList") ? "bg-gray-300" : ""
+        }`}
+      >
+        <List className="w-4 h-4" />
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        className={`p-2 rounded hover:bg-gray-200 ${
+          editor.isActive("orderedList") ? "bg-gray-300" : ""
+        }`}
+      >
+        <ListOrdered className="w-4 h-4" />
+      </button>
+      <div className="w-px bg-gray-300 mx-1"></div>
+      <button
+        type="button"
+        onClick={() => {
+          const url = window.prompt("Enter URL");
+          if (url) editor.chain().focus().setLink({ href: url }).run();
+        }}
+        className={`p-2 rounded hover:bg-gray-200 ${
+          editor.isActive("link") ? "bg-gray-300" : ""
+        }`}
+      >
+        <LinkIcon className="w-4 h-4" />
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleCode().run()}
+        className={`p-2 rounded hover:bg-gray-200 ${
+          editor.isActive("code") ? "bg-gray-300" : ""
+        }`}
+      >
+        <Code className="w-4 h-4" />
+      </button>
+      <div className="w-px bg-gray-300 mx-1"></div>
+      <input
+        type="color"
+        onInput={(e) => editor.chain().focus().setColor(e.target.value).run()}
+        className="w-8 h-8 rounded cursor-pointer"
+        title="Text Color"
+      />
+      <div className="w-px bg-gray-300 mx-1"></div>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().undo().run()}
+        className="p-2 rounded hover:bg-gray-200"
+      >
+        <Undo className="w-4 h-4" />
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().redo().run()}
+        className="p-2 rounded hover:bg-gray-200"
+      >
+        <Redo className="w-4 h-4" />
+      </button>
+    </div>
+  );
+};
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -46,6 +184,14 @@ export default function AdminDashboard() {
   // Blog state
   const [blogPosts, setBlogPosts] = useState([]);
   const [blogLoading, setBlogLoading] = useState(false);
+  const [blogAdditionalImages, setBlogAdditionalImages] = useState([
+    null,
+    null,
+    null,
+  ]);
+  const [youtubeLink, setYoutubeLink] = useState("");
+  const [attachmentFile, setAttachmentFile] = useState(null);
+  const [externalLink, setExternalLink] = useState("");
   const [blogForm, setBlogForm] = useState({
     title: "",
     slug: "",
@@ -72,7 +218,165 @@ export default function AdminDashboard() {
     is_active: true,
   });
   const [editingSignedBook, setEditingSignedBook] = useState(null);
+  // end
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      Link.configure({ openOnClick: false }),
+      Image,
+      Youtube.configure({ width: 640, height: 480 }),
+      TextStyle,
+      Color,
+    ],
+    content: blogForm.content,
+    onUpdate: ({ editor }) => {
+      setBlogForm({ ...blogForm, content: editor.getHTML() });
+    },
+  });
 
+  // Update editor content when editing a post
+  useEffect(() => {
+    if (editor && editingBlogPost) {
+      editor.commands.setContent(blogForm.content);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editingBlogPost]);
+  // Enhanced saveBlogPost function
+  const saveBlogPost = async (e) => {
+    e.preventDefault();
+    const { show } = toast;
+    if (!blogForm.title || !blogForm.slug) {
+      show("Title and slug are required", { type: "error" });
+      return;
+    }
+    setBlogLoading(true);
+    try {
+      let featured_image = blogForm.featured_image;
+      let additional_images = [];
+      let attachment_url = "";
+
+      // Upload featured image
+      if (blogImageFile) {
+        try {
+          const fileName = `blog_${Date.now()}_${blogImageFile.name}`;
+          const { error: upErr } = await supabase.storage
+            .from("book-images")
+            .upload(fileName, blogImageFile, {
+              cacheControl: "3600",
+              upsert: false,
+            });
+
+          if (!upErr) {
+            const { data: publicUrlData } = supabase.storage
+              .from("book-images")
+              .getPublicUrl(fileName);
+            featured_image = publicUrlData.publicUrl;
+          }
+        } catch (uploadError) {
+          console.warn("Featured image upload error:", uploadError);
+        }
+      }
+
+      // Upload additional images
+      for (let i = 0; i < blogAdditionalImages.length; i++) {
+        if (blogAdditionalImages[i]) {
+          try {
+            const fileName = `blog_additional_${Date.now()}_${i}_${
+              blogAdditionalImages[i].name
+            }`;
+            const { error: upErr } = await supabase.storage
+              .from("book-images")
+              .upload(fileName, blogAdditionalImages[i], {
+                cacheControl: "3600",
+                upsert: false,
+              });
+
+            if (!upErr) {
+              const { data: publicUrlData } = supabase.storage
+                .from("book-images")
+                .getPublicUrl(fileName);
+              additional_images.push(publicUrlData.publicUrl);
+            }
+          } catch (uploadError) {
+            console.warn(`Additional image ${i} upload error:`, uploadError);
+          }
+        }
+      }
+
+      // Upload attachment file
+      if (attachmentFile) {
+        try {
+          const fileName = `blog_attachment_${Date.now()}_${
+            attachmentFile.name
+          }`;
+          const { error: upErr } = await supabase.storage
+            .from("book-images")
+            .upload(fileName, attachmentFile, {
+              cacheControl: "3600",
+              upsert: false,
+            });
+
+          if (!upErr) {
+            const { data: publicUrlData } = supabase.storage
+              .from("book-images")
+              .getPublicUrl(fileName);
+            attachment_url = publicUrlData.publicUrl;
+          }
+        } catch (uploadError) {
+          console.warn("Attachment upload error:", uploadError);
+        }
+      }
+
+      const payload = {
+        ...blogForm,
+        featured_image,
+        additional_images: JSON.stringify(additional_images),
+        youtube_link: youtubeLink,
+        attachment_url,
+        external_link: externalLink,
+      };
+
+      if (editingBlogPost) {
+        const { error } = await supabase
+          .from("blog_posts")
+          .update(payload)
+          .eq("id", editingBlogPost.id);
+        if (error) throw error;
+        show("Blog post updated!", { type: "success" });
+      } else {
+        const { error } = await supabase.from("blog_posts").insert([payload]);
+        if (error) throw error;
+        show("Blog post created!", { type: "success" });
+      }
+
+      // Reset form
+      setBlogForm({
+        title: "",
+        slug: "",
+        excerpt: "",
+        content: "",
+        author: "",
+        featured_image: "",
+        status: "published",
+      });
+      editor?.commands.setContent("");
+      setBlogImageFile(null);
+      setBlogAdditionalImages([null, null, null]);
+      setYoutubeLink("");
+      setAttachmentFile(null);
+      setExternalLink("");
+      setEditingBlogPost(null);
+      fetchBlogPosts();
+    } catch (err) {
+      console.error(err);
+      show("Failed to save blog post.", { type: "error" });
+    } finally {
+      setBlogLoading(false);
+    }
+  };
+
+  // end
   useEffect(() => {
     if (!requireAdmin()) {
       navigate("/admin/login");
@@ -82,7 +386,9 @@ export default function AdminDashboard() {
     fetchOrders();
     fetchSignedBooksInfo();
     fetchBlogPosts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  // eslint-disable-next-line no-unused-vars
   const deleteBook = async (slug) => {
     if (
       !confirm(
@@ -105,85 +411,85 @@ export default function AdminDashboard() {
       toast.show("Failed to delete book.", { type: "error" });
     }
   };
-  const saveBlogPost = async (e) => {
-    e.preventDefault();
-    const { show } = toast;
-    if (!blogForm.title || !blogForm.slug) {
-      show("Title and slug are required", { type: "error" });
-      return;
-    }
-    setBlogLoading(true);
-    try {
-      let featured_image = blogForm.featured_image;
+  // const saveBlogPost = async (e) => {
+  //   e.preventDefault();
+  //   const { show } = toast;
+  //   if (!blogForm.title || !blogForm.slug) {
+  //     show("Title and slug are required", { type: "error" });
+  //     return;
+  //   }
+  //   setBlogLoading(true);
+  //   try {
+  //     let featured_image = blogForm.featured_image;
 
-      if (blogImageFile) {
-        try {
-          const fileName = `blog_${Date.now()}_${blogImageFile.name}`;
-          const { error: upErr } = await supabase.storage
-            .from("book-images")
-            .upload(fileName, blogImageFile, {
-              cacheControl: "3600",
-              upsert: false,
-            });
+  //     if (blogImageFile) {
+  //       try {
+  //         const fileName = `blog_${Date.now()}_${blogImageFile.name}`;
+  //         const { error: upErr } = await supabase.storage
+  //           .from("book-images")
+  //           .upload(fileName, blogImageFile, {
+  //             cacheControl: "3600",
+  //             upsert: false,
+  //           });
 
-          if (!upErr) {
-            const { data: publicUrlData } = supabase.storage
-              .from("book-images")
-              .getPublicUrl(fileName);
-            featured_image = publicUrlData.publicUrl;
-          }
-        } catch (uploadError) {
-          console.warn("Image upload error:", uploadError);
-        }
-      }
+  //         if (!upErr) {
+  //           const { data: publicUrlData } = supabase.storage
+  //             .from("book-images")
+  //             .getPublicUrl(fileName);
+  //           featured_image = publicUrlData.publicUrl;
+  //         }
+  //       } catch (uploadError) {
+  //         console.warn("Image upload error:", uploadError);
+  //       }
+  //     }
 
-      const payload = { ...blogForm, featured_image };
+  //     const payload = { ...blogForm, featured_image };
 
-      if (editingBlogPost) {
-        const { error } = await supabase
-          .from("blog_posts")
-          .update(payload)
-          .eq("id", editingBlogPost.id);
-        if (error) throw error;
-        show("Blog post updated!", { type: "success" });
-      } else {
-        const { error } = await supabase.from("blog_posts").insert([payload]);
-        if (error) throw error;
-        show("Blog post created!", { type: "success" });
-      }
+  //     if (editingBlogPost) {
+  //       const { error } = await supabase
+  //         .from("blog_posts")
+  //         .update(payload)
+  //         .eq("id", editingBlogPost.id);
+  //       if (error) throw error;
+  //       show("Blog post updated!", { type: "success" });
+  //     } else {
+  //       const { error } = await supabase.from("blog_posts").insert([payload]);
+  //       if (error) throw error;
+  //       show("Blog post created!", { type: "success" });
+  //     }
 
-      setBlogForm({
-        title: "",
-        slug: "",
-        excerpt: "",
-        content: "",
-        author: "",
-        featured_image: "",
-        status: "published",
-      });
-      setBlogImageFile(null);
-      setEditingBlogPost(null);
-      fetchBlogPosts();
-    } catch (err) {
-      console.error(err);
-      show("Failed to save blog post.", { type: "error" });
-    } finally {
-      setBlogLoading(false);
-    }
-  };
+  //     setBlogForm({
+  //       title: "",
+  //       slug: "",
+  //       excerpt: "",
+  //       content: "",
+  //       author: "",
+  //       featured_image: "",
+  //       status: "published",
+  //     });
+  //     setBlogImageFile(null);
+  //     setEditingBlogPost(null);
+  //     fetchBlogPosts();
+  //   } catch (err) {
+  //     console.error(err);
+  //     show("Failed to save blog post.", { type: "error" });
+  //   } finally {
+  //     setBlogLoading(false);
+  //   }
+  // };
 
-  const deleteBlogPost = async (id) => {
-    if (!confirm("Are you sure you want to delete this post?")) return;
-    try {
-      const { error } = await supabase.from("blog_posts").delete().eq("id", id);
-      if (error) throw error;
-      toast.show("Blog post deleted!", { type: "success" });
-      fetchBlogPosts();
-    } catch (err) {
-      console.error(err);
-      toast.show("Failed to delete blog post.", { type: "error" });
-    }
-  };
+  // const deleteBlogPost = async (id) => {
+  //   if (!confirm("Are you sure you want to delete this post?")) return;
+  //   try {
+  //     const { error } = await supabase.from("blog_posts").delete().eq("id", id);
+  //     if (error) throw error;
+  //     toast.show("Blog post deleted!", { type: "success" });
+  //     fetchBlogPosts();
+  //   } catch (err) {
+  //     console.error(err);
+  //     toast.show("Failed to delete blog post.", { type: "error" });
+  //   }
+  // };
 
   const fetchBooks = async () => {
     setLoading(true);
@@ -439,6 +745,128 @@ export default function AdminDashboard() {
     });
   }, [orders, search]);
 
+  const MenuBar = ({ editor }) => {
+    if (!editor) return null;
+
+    return (
+      <div className="border border-gray-300 rounded-t-lg bg-gray-50 p-2 flex flex-wrap gap-1">
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          className={`p-2 rounded hover:bg-gray-200 ${
+            editor.isActive("bold") ? "bg-gray-300" : ""
+          }`}
+        >
+          <Bold className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          className={`p-2 rounded hover:bg-gray-200 ${
+            editor.isActive("italic") ? "bg-gray-300" : ""
+          }`}
+        >
+          <Italic className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
+          className={`p-2 rounded hover:bg-gray-200 ${
+            editor.isActive("underline") ? "bg-gray-300" : ""
+          }`}
+        >
+          <UnderlineIcon className="w-4 h-4" />
+        </button>
+        <div className="w-px bg-gray-300 mx-1"></div>
+        <button
+          type="button"
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 1 }).run()
+          }
+          className={`p-2 rounded hover:bg-gray-200 ${
+            editor.isActive("heading", { level: 1 }) ? "bg-gray-300" : ""
+          }`}
+        >
+          <Heading1 className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 2 }).run()
+          }
+          className={`p-2 rounded hover:bg-gray-200 ${
+            editor.isActive("heading", { level: 2 }) ? "bg-gray-300" : ""
+          }`}
+        >
+          <Heading2 className="w-4 h-4" />
+        </button>
+        <div className="w-px bg-gray-300 mx-1"></div>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          className={`p-2 rounded hover:bg-gray-200 ${
+            editor.isActive("bulletList") ? "bg-gray-300" : ""
+          }`}
+        >
+          <List className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          className={`p-2 rounded hover:bg-gray-200 ${
+            editor.isActive("orderedList") ? "bg-gray-300" : ""
+          }`}
+        >
+          <ListOrdered className="w-4 h-4" />
+        </button>
+        <div className="w-px bg-gray-300 mx-1"></div>
+        <button
+          type="button"
+          onClick={() => {
+            const url = window.prompt("Enter URL");
+            if (url) editor.chain().focus().setLink({ href: url }).run();
+          }}
+          className={`p-2 rounded hover:bg-gray-200 ${
+            editor.isActive("link") ? "bg-gray-300" : ""
+          }`}
+        >
+          <LinkIcon className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleCode().run()}
+          className={`p-2 rounded hover:bg-gray-200 ${
+            editor.isActive("code") ? "bg-gray-300" : ""
+          }`}
+        >
+          <Code className="w-4 h-4" />
+        </button>
+        <div className="w-px bg-gray-300 mx-1"></div>
+        <input
+          type="color"
+          onInput={(e) => editor.chain().focus().setColor(e.target.value).run()}
+          className="w-8 h-8 rounded cursor-pointer"
+          title="Text Color"
+        />
+        <div className="w-px bg-gray-300 mx-1"></div>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().undo().run()}
+          className="p-2 rounded hover:bg-gray-200"
+        >
+          <Undo className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().redo().run()}
+          className="p-2 rounded hover:bg-gray-200"
+        >
+          <Redo className="w-4 h-4" />
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50">
       {/* Header */}
@@ -675,70 +1103,115 @@ export default function AdminDashboard() {
               </form>
             </div>
 
-            {/* Books List */}
-            <div className="space-y-3 max-h-[600px] overflow-y-auto">
-              {books.map((b) => (
-                <div
-                  key={b.slug || b.id}
-                  className="border border-gray-200 p-3 rounded-lg hover:border-indigo-300 hover:shadow-md transition-all"
-                >
-                  <div className="flex items-start gap-3 mb-3">
-                    <img
-                      src={
-                        b.image_url ||
-                        b.image ||
-                        "https://via.placeholder.com/48"
-                      }
-                      alt=""
-                      className="w-12 h-12 object-cover rounded-lg shadow-sm"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-gray-900 truncate">
-                        {b.title}
-                      </div>
-                      <div className="text-xs text-gray-500 truncate">
-                        {b.slug}
-                      </div>
-                      <div className="text-sm font-medium text-indigo-600">
-                        {b.price}
+            {/* Blog Posts List */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Blog Posts
+              </h3>
+              {blogLoading && (
+                <div className="text-sm text-gray-500">Loading...</div>
+              )}
+              <div className="space-y-3 max-h-[600px] overflow-y-auto">
+                {blogPosts.map((post) => (
+                  <div
+                    key={post.id}
+                    className="border border-gray-200 p-4 rounded-lg hover:border-indigo-300 hover:shadow-md transition-all"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-gray-900 truncate flex items-center gap-2">
+                          {post.title}
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                              post.status === "published"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
+                            {post.status}
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          {post.slug}
+                        </div>
+                        {post.author && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            By {post.author}
+                          </div>
+                        )}
                       </div>
                     </div>
+                    {post.excerpt && (
+                      <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+                        {post.excerpt}
+                      </p>
+                    )}
+                    <div className="flex gap-2 mt-3">
+                      <button
+                        onClick={() => {
+                          setEditingBlogPost(post);
+                          setBlogForm({
+                            title: post.title || "",
+                            slug: post.slug || "",
+                            excerpt: post.excerpt || "",
+                            content: post.content || "",
+                            author: post.author || "",
+                            featured_image: post.featured_image || "",
+                            status: post.status || "published",
+                          });
+                          // Set additional fields for editing
+                          setYoutubeLink(post.youtube_link || "");
+                          setExternalLink(post.external_link || "");
+                          // Note: Can't restore file inputs, but URLs are preserved
+                        }}
+                        className="flex-1 px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors flex items-center justify-center gap-1"
+                      >
+                        <Edit2 className="w-3 h-3" />
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (
+                            !confirm(
+                              "Are you sure you want to delete this post?"
+                            )
+                          )
+                            return;
+                          const deleteBlogPost = async () => {
+                            try {
+                              const { error } = await supabase
+                                .from("blog_posts")
+                                .delete()
+                                .eq("id", post.id);
+                              if (error) throw error;
+                              toast.show("Blog post deleted!", {
+                                type: "success",
+                              });
+                              fetchBlogPosts();
+                            } catch (err) {
+                              console.error(err);
+                              toast.show("Failed to delete blog post.", {
+                                type: "error",
+                              });
+                            }
+                          };
+                          deleteBlogPost();
+                        }}
+                        className="flex-1 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center gap-1"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        Delete
+                      </button>
+                    </div>
                   </div>
-
-                  {/* Edit and Delete Buttons */}
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => {
-                        setEditingBook(b);
-                        setForm({
-                          title: b.title || "",
-                          slug: b.slug || "",
-                          price: b.price || "",
-                          description: b.description || "",
-                        });
-                        setFile(null);
-                      }}
-                      className="flex-1 px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors flex items-center justify-center gap-1"
-                    >
-                      <Edit2 className="w-3 h-3" />
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => deleteBook(b.slug)}
-                      className="flex-1 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center gap-1"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                      Delete
-                    </button>
+                ))}
+                {blogPosts.length === 0 && !blogLoading && (
+                  <div className="text-center py-8 text-gray-500">
+                    <BookOpen className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                    <p className="text-sm">No blog posts yet</p>
                   </div>
-                </div>
-              ))}
-              {books.length === 0 && !loading && (
-                <div className="text-center py-8 text-gray-500">
-                  <Package className="w-12 h-12 mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm">No books yet</p>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -817,17 +1290,15 @@ export default function AdminDashboard() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Content *
+                    Content * (Rich Text Editor)
                   </label>
-                  <textarea
-                    value={blogForm.content}
-                    onChange={(e) =>
-                      setBlogForm({ ...blogForm, content: e.target.value })
-                    }
-                    placeholder="Write your blog post..."
-                    rows={10}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"
-                  />
+                  <div className="border border-gray-300 rounded-lg overflow-hidden">
+                    <MenuBar editor={editor} />
+                    <EditorContent
+                      editor={editor}
+                      className="prose max-w-none p-4 min-h-[300px] focus:outline-none"
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -842,6 +1313,90 @@ export default function AdminDashboard() {
                     }
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Additional Images (Up to 3)
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {[0, 1, 2].map((index) => (
+                      <div key={index}>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const newImages = [...blogAdditionalImages];
+                            newImages[index] = e.target.files?.[0] || null;
+                            setBlogAdditionalImages(newImages);
+                          }}
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-medium file:bg-indigo-50 file:text-indigo-700"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Image {index + 1}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Video Link (YouTube, TikTok, Facebook, Instagram)
+                  </label>
+                  <input
+                    type="url"
+                    value={youtubeLink}
+                    onChange={(e) => setYoutubeLink(e.target.value)}
+                    placeholder="Paste video URL here..."
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Supports: YouTube, TikTok, Facebook, Instagram Reels
+                  </p>
+                  {youtubeLink && (
+                    <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <p className="text-xs text-green-700 font-medium">
+                        ✓ Video link added - Preview will be shown in the blog
+                        post
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Attachment File (PDF, DOC, etc.)
+                  </label>
+                  <input
+                    type="file"
+                    onChange={(e) =>
+                      setAttachmentFile(e.target.files?.[0] || null)
+                    }
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700"
+                  />
+                  {attachmentFile && (
+                    <p className="text-xs text-green-600 mt-1">
+                      ✓ {attachmentFile.name} selected
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    External Link (Button)
+                  </label>
+                  <input
+                    type="url"
+                    value={externalLink}
+                    onChange={(e) => setExternalLink(e.target.value)}
+                    placeholder="https://example.com"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {externalLink
+                      ? '✓ "Click Me" button will appear on blog post'
+                      : 'Add a link to show "Click Me" button'}
+                  </p>
                 </div>
 
                 <div>
@@ -875,7 +1430,12 @@ export default function AdminDashboard() {
                           featured_image: "",
                           status: "published",
                         });
+                        editor?.commands.setContent("");
                         setBlogImageFile(null);
+                        setBlogAdditionalImages([null, null, null]);
+                        setYoutubeLink("");
+                        setAttachmentFile(null);
+                        setExternalLink("");
                       }}
                       className="px-6 py-3 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-all"
                     >
@@ -897,86 +1457,7 @@ export default function AdminDashboard() {
               </form>
             </div>
 
-            {/* Blog Posts List */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Blog Posts
-              </h3>
-              {blogLoading && (
-                <div className="text-sm text-gray-500">Loading...</div>
-              )}
-              <div className="space-y-3 max-h-[600px] overflow-y-auto">
-                {blogPosts.map((post) => (
-                  <div
-                    key={post.id}
-                    className="border border-gray-200 p-4 rounded-lg hover:border-indigo-300 hover:shadow-md transition-all"
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-gray-900 truncate flex items-center gap-2">
-                          {post.title}
-                          <span
-                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                              post.status === "published"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-yellow-100 text-yellow-800"
-                            }`}
-                          >
-                            {post.status}
-                          </span>
-                        </div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          {post.slug}
-                        </div>
-                        {post.author && (
-                          <div className="text-xs text-gray-500 mt-1">
-                            By {post.author}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    {post.excerpt && (
-                      <p className="text-sm text-gray-600 mt-2 line-clamp-2">
-                        {post.excerpt}
-                      </p>
-                    )}
-                    <div className="flex gap-2 mt-3">
-                      <button
-                        onClick={() => {
-                          setEditingBlogPost(post);
-                          setBlogForm({
-                            title: post.title || "",
-                            slug: post.slug || "",
-                            excerpt: post.excerpt || "",
-                            content: post.content || "",
-                            author: post.author || "",
-                            featured_image: post.featured_image || "",
-                            status: post.status || "published",
-                          });
-                        }}
-                        className="flex-1 px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors flex items-center justify-center gap-1"
-                      >
-                        <Edit2 className="w-3 h-3" />
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => deleteBlogPost(post.id)}
-                        className="flex-1 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center gap-1"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                {blogPosts.length === 0 && !blogLoading && (
-                  <div className="text-center py-8 text-gray-500">
-                    <BookOpen className="w-12 h-12 mx-auto mb-2 text-gray-400" />
-                    <p className="text-sm">No blog posts yet</p>
-                  </div>
-                )}
-              </div>
-            </div>
+            {/* Keep your existing Blog Posts List */}
           </div>
         )}
 

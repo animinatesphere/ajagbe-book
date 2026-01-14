@@ -18,7 +18,7 @@ export default function OrderForm({ open, onClose }) {
     return s + parseFloat(n || "0") * (it.qty || 1);
   }, 0);
 
-  const transportFee = delivery === "physical" ? 1000 : 0;
+  const transportFee = delivery === "physical" ? 0 : 0;
   const total = subtotal + transportFee;
 
   const toast = useToast();
@@ -334,7 +334,7 @@ export default function OrderForm({ open, onClose }) {
                     className="w-4 h-4 text-gray-900 focus:ring-gray-900"
                   />
                   <span className="text-sm">
-                    Physical copy (+₦1,000 transport)
+                    Physical copy (based on location)
                   </span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -344,7 +344,7 @@ export default function OrderForm({ open, onClose }) {
                     onChange={() => setDelivery("pdf")}
                     className="w-4 h-4 text-gray-900 focus:ring-gray-900"
                   />
-                  <span className="text-sm">PDF (Free)</span>
+                  <span className="text-sm">PDF (undefined)</span>
                 </label>
               </div>
             </div>

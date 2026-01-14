@@ -8,13 +8,21 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
-    
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.86.2",
     "@tailwindcss/vite": "^4.1.17",
+    "@tiptap/extension-color": "^3.14.0",
+    "@tiptap/extension-image": "^3.14.0",
+    "@tiptap/extension-link": "^3.14.0",
+    "@tiptap/extension-text-style": "^3.14.0",
+    "@tiptap/extension-underline": "^3.14.0",
+    "@tiptap/extension-youtube": "^3.14.0",
+    "@tiptap/react": "^3.14.0",
+    "@tiptap/starter-kit": "^3.14.0",
     "animate.css": "^4.1.1",
     "lucide-react": "^0.555.0",
+    "quill": "^2.0.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.10.0",

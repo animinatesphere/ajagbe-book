@@ -16,19 +16,39 @@ export default function SubscribeModal({ onClose }) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     setError("");
     if (!validateEmail(email)) {
       setError("Please enter a valid email address");
       return;
     }
 
-    // simulate send
-    setSent(true);
-    setTimeout(() => {
-      setOpen(false);
-      if (onClose) onClose();
-    }, 700);
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          access_key: "7ad34e05-087f-49d6-b593-0a57134ddf96", // Replace with your key
+          subject: "New Newsletter Subscription",
+          email: email,
+          message: `New subscriber: ${email}`,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Subscription failed");
+      }
+
+      setSent(true);
+      setTimeout(() => {
+        setOpen(false);
+        if (onClose) onClose();
+      }, 700);
+    } catch (err) {
+      setError(err.message || "Something went wrong. Please try again.");
+    }
   };
 
   if (!open) return null;
